@@ -26,6 +26,7 @@ let showOnlyCanAfford = true;
 let forwardDirection = true;
 let onlyCanAfford = false;
 // ==OTHER==
+const version = "1.2";
 let sorterElement = null;
 let changeables = null;
 let ObjectsToSort = [];
@@ -444,27 +445,29 @@ const BuildingSorter = {
         updateBuildingAnimations();
         addSorter();
         sort();
-        Game.Notify("Building Sorter", "The mod 'Building Sorter' has loaded successfully, check the settings for more info about how the mod sorts.", [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
     },
 
     save: function(){
-        return `${sorterType}|${animateBuildings ? 1 : 0}|${showSorterChanger ? 1 : 0}|${showDirectionChanger ? 1 : 0}|${showOnlyCanAfford ? 1 : 0}`;
+        return `${sorterType}|${animateBuildings ? 1 : 0}|${showSorterChanger ? 1 : 0}|${showDirectionChanger ? 1 : 0}|${showOnlyCanAfford ? 1 : 0}|${this.DisableNotif}`;
     },
-
+    DisableNotif:0,
     load: function(str){
         let arr = str.split("|");
-        if(arr[0]) sorterType = parseInt(arr[0], 10) || 0;
-        if(arr[1]) animateBuildings = parseInt(arr[1], 10) === 1;
-        if(arr[2]) showSorterChanger = parseInt(arr[2], 10) === 1;
-        if(arr[3]) showDirectionChanger = parseInt(arr[3], 10) === 1;
-        if(arr[4]) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
+        if(arr[0]&&!isNaN(arr[0])) sorterType = parseInt(arr[0], 10) || 0;
+        if(arr[1]&&!isNaN(arr[1])) animateBuildings = parseInt(arr[1], 10) === 1;
+        if(arr[2]&&!isNaN(arr[2])) showSorterChanger = parseInt(arr[2], 10) === 1;
+        if(arr[3]&&!isNaN(arr[3])) showDirectionChanger = parseInt(arr[3], 10) === 1;
+        if(arr[4]&&!isNaN(arr[4])) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
+        if(arr[5]&&!isNaN(arr[5])) this.DisableNotif = parseInt(arr[5], 10);
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
         if(isNaN(sorterType)) sorterType = 0;
         updateSorterButtons();
         updateBuildingAnimations();
         sort();
-        if(changeables) changeables.children[0].innerText = sortersOptions[sorterType].text;
+        if(this.DisableNotif === 0) Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully, check the settings for more info about how the mod sorts.<a style="float:right;" onclick="Game.mods.BuildingSorter.DisableNotif=1;==CLOSETHIS()==">Don't show this again</a>` , [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+        else Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully` , [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], true);
+
     }
 };
 
