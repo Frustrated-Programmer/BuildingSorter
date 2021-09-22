@@ -454,7 +454,7 @@ const BuildingSorter = {
         if(arr[1]) animateBuildings = parseInt(arr[1], 10) === 1;
         if(arr[2]) showSorterChanger = parseInt(arr[2], 10) === 1;
         if(arr[3]) showDirectionChanger = parseInt(arr[3], 10) === 1;
-        if(arr[4]) showOnlyCanAfford = parseInt(arr[3], 10) === 1;
+        if(arr[4]) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
         if(isNaN(sorterType)) sorterType = 0;
