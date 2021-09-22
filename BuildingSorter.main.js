@@ -67,8 +67,8 @@ let sortersOptions = [
             quote: "Where shall I spend this dough?"
         },
         sort: function(array){
-            if(forwardDirection) array.sort((a, b) => a.price - b.price);
-            else array.sort((a, b) => b.price - a.price);
+            if(forwardDirection) array.sort((a, b) => a.bulkPrice - b.bulkPrice);
+            else array.sort((a, b) => b.bulkPrice - a.bulkPrice);
         }
     },
     {
@@ -235,7 +235,7 @@ function sort(){
         let arrayToSort1 = [];//Affordable
         let arrayToSort2 = [];//Unaffordable
         for(let i = 0; i < ObjectsToSort.length; i++){
-            if(ObjectsToSort[i].price <= Game.cookies){
+            if(ObjectsToSort[i].bulkPrice <= Game.cookies){
                 arrayToSort1.push(ObjectsToSort[i]);
             }
             else arrayToSort2.push(ObjectsToSort[i]);
