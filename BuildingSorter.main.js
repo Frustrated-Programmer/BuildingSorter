@@ -106,11 +106,18 @@ let sortersOptions = [
                 }
                 if(buildingAchievementTiers[aTier + 1]) aRemainder = buildingAchievementTiers[aTier + 1] - a.amount;
                 if(buildingAchievementTiers[bTier + 1]) bRemainder = buildingAchievementTiers[bTier + 1] - b.amount;
-
-                if(isFinite(aRemainder) && isFinite(bRemainder)){
-                    return a.getSumPrice(aRemainder) - b.getSumPrice(bRemainder);
+                if(forwardDirection){
+                    if(isFinite(aRemainder) && isFinite(bRemainder)){
+                        return a.getSumPrice(aRemainder) - b.getSumPrice(bRemainder);
+                    }
+                    else return a.id - b.id;
                 }
-                else return a.id - b.id;
+                else{
+                    if(isFinite(aRemainder) && isFinite(bRemainder)){
+                        return b.getSumPrice(aRemainder) - a.getSumPrice(bRemainder);
+                    }
+                    else return b.id - a.id;
+                }
             });
         }
     },
@@ -313,7 +320,6 @@ function addSorter(){
     sorterButton.style.width = "100px";
     sorterButton.onclick = function(){
         sorterType++;
-        console.log("SorterType =", sorterType);
         if(sorterType === sortersOptions.length) sorterType = 0;
         sorterButton.innerText = sortersOptions[sorterType].text;
         sort();
@@ -452,10 +458,10 @@ const BuildingSorter = {
     load: function(str){
         let arr = str.split("|");
         if(arr[0]) sorterType = parseInt(arr[0], 10) || 0;
-        if(arr[1]) animateBuildings = parseInt(arr[2], 10) === 1;
-        if(arr[2]) showSorterChanger = parseInt(arr[3], 10) === 1;
-        if(arr[3]) showDirectionChanger = parseInt(arr[4], 10) === 1;
-        if(arr[4]) showOnlyCanAfford = parseInt(arr[5], 10) === 1;
+        if(arr[1]) animateBuildings = parseInt(arr[1], 10) === 1;
+        if(arr[2]) showSorterChanger = parseInt(arr[2], 10) === 1;
+        if(arr[3]) showDirectionChanger = parseInt(arr[3], 10) === 1;
+        if(arr[4]) showOnlyCanAfford = parseInt(arr[3], 10) === 1;
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
         if(isNaN(sorterType)) sorterType = 0;
