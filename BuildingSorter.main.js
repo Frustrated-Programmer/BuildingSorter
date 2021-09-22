@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      1.0
+// @version      1.1
 // @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
@@ -373,8 +373,11 @@ function createSettingsButton(Title, Description, append, onclick){
 function addSettings(){
     let settings = l("buildingSorterSettings");
     if(settings) return;
-    if(!l("menu")) return;
-    let settingsHolder = l("menu").children[2];
+    let menu = l("menu");
+    if(!menu) return;
+    if(!menu.children[1]) return;
+    if(!menu.children[1].innerHTML.toString().toLowerCase().includes("options")) return;
+    let settingsHolder = menu.children[2];
     if(!settingsHolder) return;
     else settings = document.createElement("div");
     settings.id = "buildingSorterSettings";
