@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      1.3
+// @version      1.2
 // @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
@@ -22,6 +22,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  **/
+
 // ==SAVED SETTINGS==
 let sorterType = 0;
 let animateBuildings = true;
@@ -33,7 +34,7 @@ let showOnlyCanAfford = true;
 let forwardDirection = true;
 let onlyCanAfford = false;
 // ==OTHER==
-const version = "1.3";
+const version = "1.2";
 let sorterElement = null;
 let changeables = null;
 let ObjectsToSort = [];
@@ -162,6 +163,36 @@ let sortersOptions = [
         }
     }
 ];
+// ==Create CSS==
+let CSSFILE = `
+    #ModBuildingSorter_selectHolder{
+        grid-row: 2 / 2;
+        height: 22px;
+        background: url(img/panelHorizontal.png?v=2) repeat-x center;
+        background-size: cover;
+    }
+    #ModBuildingSorter_selectHolder span{
+        z-index: 1000;
+        text-shadow: 0px 1px 1px #360e00, 0px -1px 1px #360e00, 1px 0px 1px #360e00, -1px 0px 1px #360e00
+        font-weight: bold;
+        color: #F6DAB8;
+        opacity: 1;
+        lineHeight: 22px;
+        fontVariant: small-caps;
+    }
+    #ModBuildingSorter_SettingsTitle{
+        fontSize: 22px;
+        paddingLeft: 16px;
+        marginBottom: 8px;
+        background: linear-gradient(to right,rgba(0,0,0,0.5),rgba(0,0,0,0),rgba(0,0,0,0),rgba(0,0,0,0));
+    }
+`;
+let head = document.getElementsByTagName('head')[0];
+let style = document.createElement('style');
+style.id = "ModBuildingSorter_CSS"
+style.type = 'text/css';
+style.innerHTML = CSSFILE;
+head.appendChild(style);
 
 function directionButtonTooltip(){
     return `<div style="padding:8px 4px;min-width:350px;">
@@ -270,13 +301,7 @@ function sort(){
 
 function applyFancyCss(bttn){
     bttn.classList.add("option");
-    return;
-    bttn.style.border = "1px solid #e2dd48";
-    bttn.style.borderColor = ["#ECE2B6", "#875526", "#733726", "#DFBC9A"];
-    bttn.style.borderRadius = "2px";
-    bttn.style.margin = 0;
-    bttn.style.padding = 0;
-    bttn.style.whiteSpace = "nowrap";
+    //USED TO HAVE OTHER STUFF, BUT THEN I FOUND THE CLASSLIST .option
 }
 
 function updateSorterButtons(){
@@ -298,18 +323,8 @@ function addSorter(){
     }
     let selectHolder = document.createElement("div");
     sorterElement = selectHolder;
-    selectHolder.style.gridRow = "2 / 2";
-    selectHolder.style.height = "22px";
-    selectHolder.style.background = "url(img/panelHorizontal.png?v=2) repeat-x center";
-    selectHolder.style.backgroundSize = "cover";
+    selectHolder.id= "ModBuildingSorter_selectHolder"
     let text = document.createElement("span");
-    text.style.zIndex = 1000;
-    text.style.textShadow = ["0px 1px 1px #360e00", "0px -1px 1px #360e00", "1px 0px 1px #360e00", "-1px 0px 1px #360e00"];
-    text.style.fontWeight = "bold";
-    text.style.color = "#F6DAB8";
-    text.style.opacity = 1;
-    text.style.lineHeight = "22px";
-    text.style.fontVariant = "small-caps";
     selectHolder.appendChild(text);
     text.innerText = "Sort Buildings By:";
     changeables = document.createElement("div");
@@ -387,10 +402,7 @@ function addSettings(){
     let buttonsHolder = document.createElement("div");
     buttonsHolder.classList = "listing";
     settingsTitle.classList.add("title");
-    settingsTitle.style.fontSize = "22px";
-    settingsTitle.style.paddingLeft = "16px";
-    settingsTitle.style.marginBottom = "8px";
-    settingsTitle.style.background = "linear-gradient(to right,rgba(0,0,0,0.5),rgba(0,0,0,0),rgba(0,0,0,0),rgba(0,0,0,0));";
+    settingsTitle.id = "ModBuildingSorter_SettingsTitle"
     settingsTitle.innerText = "Buildings Sorter";
     settings.appendChild(settingsTitle);
     let description = document.createElement("div");
@@ -421,20 +433,16 @@ function addSettings(){
         this.innerText = animateBuildings ? "Animating Buildings" : "Instant Buildings";
         updateBuildingAnimations();
     });
-    createSettingsButton(disabled ? "Disabled" : "Enabled", "Whether to temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Clicker", buttonsHolder, function(){
+    createSettingsButton(disabled ? "Disabled" : "Enabled", "Whether to temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
         disabled = !disabled;
         this.innerText = disabled ? "Disabled" : "Enabled";
         sort();
         products.style.display = "grid";//CookieMonster requires this. I'd rather not break a well known mod. But shame it doesn't update this itself.
         sorterElement.style.display = disabled ? "none" : "flex";
     });
-    createSettingsButton(BuildingSorter.CheckForUpdates ? "Allowing checks for updates" : "Staying offline", "Whether to check if the mod has some updates or not.", buttonsHolder, function(){
-        BuildingSorter.CheckForUpdates = BuildingSorter.CheckForUpdates === 1 ? 0 : 1;
-        this.innerText = BuildingSorter.CheckForUpdates ? "Allowing checks for updates" : "Staying offline";
-    });
     settings.append(buttonsHolder);
-    //ADD SETTINGS
-    //BEFORE cookieMonster's settings though, they have a massive list of settings.
+//ADD SETTINGS
+//BEFORE cookieMonster's settings though, they have a massive list of settings.
     if(l("cookieMonsterFrameworkMenuSection")){
         settingsHolder.insertBefore(settings, l("cookieMonsterFrameworkMenuSection"));
     }
@@ -443,20 +451,7 @@ function addSettings(){
     }
 }
 
-function updateNotification(newVersion, patchnotes){
-    let patchnote = patchnotes[newVersion];
-    if(patchnote){
-        Game.mods.BuildingSorter.showPatchNotes = function(){
-            Game.Prompt(`<h3>Update Version ${newVersion}</h3><div class="block"><small>${patchnote.html}</small></div><a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter" id="ModBuildingSorter_HiddenUpdateLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["Update", "l('ModBuildingSorter_HiddenUpdateLinker').click()"]]);
-        };
-    }
-    Game.Notify("Update Building Sorter", `The mod 'Building Sorter' is currently <span class="ModBuildingSorter_codeStyle">v${version}</span> the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>.${patchnote ? "<a style=\"float:right;\" onclick=\"Game.mods.BuildingSorter.showPatchNotes();==CLOSETHIS()==\">Whats new?</a>" : ""}`, [21, 7], false);
-
-}
-
 const BuildingSorter = {
-    CheckForUpdates: 1,
-    DisableNotif: 0,
     init: function(){
         Game.registerHook("logic", function(value){
             addSettings();
@@ -472,8 +467,9 @@ const BuildingSorter = {
     },
 
     save: function(){
-        return `${sorterType}|${animateBuildings ? 1 : 0}|${showSorterChanger ? 1 : 0}|${showDirectionChanger ? 1 : 0}|${showOnlyCanAfford ? 1 : 0}|${this.DisableNotif}|${this.CheckForUpdates}|${version}`;
+        return `${sorterType}|${animateBuildings ? 1 : 0}|${showSorterChanger ? 1 : 0}|${showDirectionChanger ? 1 : 0}|${showOnlyCanAfford ? 1 : 0}|${this.DisableNotif}`;
     },
+    DisableNotif: 0,
     load: function(str){
         let arr = str.split("|");
         if(arr[0] && !isNaN(arr[0])) sorterType = parseInt(arr[0], 10) || 0;
@@ -482,8 +478,6 @@ const BuildingSorter = {
         if(arr[3] && !isNaN(arr[3])) showDirectionChanger = parseInt(arr[3], 10) === 1;
         if(arr[4] && !isNaN(arr[4])) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
         if(arr[5] && !isNaN(arr[5])) this.DisableNotif = parseInt(arr[5], 10);
-        if(arr[6] && !isNaN(arr[6])) this.CheckForUpdates = parseInt(arr[6], 10);
-        ///arr[7] = version.
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
         if(isNaN(sorterType)) sorterType = 0;
@@ -493,26 +487,6 @@ const BuildingSorter = {
         if(this.DisableNotif === 0) Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully, check the settings for more info about how the mod sorts.<a style="float:right;" onclick="Game.mods.BuildingSorter.DisableNotif=1;==CLOSETHIS()==">Don't show this again</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         else Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], true);
 
-        setTimeout(() => {//wait 30 secs before checking. To not overflow the notification bar.
-            if(this.CheckForUpdates === 1){
-                console.log("[Mod Building Sorter] Checking for updates.");
-                fetch("https://frustrated-programmer.github.io/BuildingSorter/version.txt").then(function(versionResponse){
-                    versionResponse.json().then(function(versionJsonResult){
-                        if(version.toLowerCase() !== `${versionJsonResult}`.toLowerCase()){
-                            let patchNoteFail = function(e){
-                                console.error(e);
-                                updateNotification(versionJsonResult, false);
-                            };
-                            fetch("https://frustrated-programmer.github.io/BuildingSorter/patchnotes.json").then(function(patchNotesResponse){
-                                patchNotesResponse.json().then(function(patchNoteJsonResponse){
-                                    updateNotification(versionJsonResult, patchNoteJsonResponse);
-                                }).catch(patchNoteFail);
-                            }).catch(patchNoteFail);
-                        }
-                    }).catch(console.error);
-                }).catch(console.error);
-            }
-        }, 30000);
     }
 };
 
