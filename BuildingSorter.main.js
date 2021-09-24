@@ -23,6 +23,19 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  **/
 
+//This is a passion project of mine. These are my ideas for how to improve. But without some donations or incredible recognition(I got 250 upvotes when I released my mod, that inspired me to release v2), I probably won't implement these. Feel free to make a PR I'll
+//TODO:
+// allow users to make MORE than 1 custom sorter, (Would need to look into finding other ways to save their custom functions so my mod doesn't have a massive save file)
+// allow users to put a name & description for their custom sorters.
+// allow users to export/import custom sorters
+// implement color coding for the custom coder (so it's more like an IDE)
+// allow dragging/dropping sorting.
+// implement adjustments to some sorters depending on whether the user is "selling" or "buying" (currently everything assumes you are buying)
+// update next achievement and next upgrade, to exclude achievements/upgrades you already own. (Prestige or Selling can reproduce)
+
+// CONSTANTS
+const version = "1.5";
+const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==SAVED SETTINGS==
 let sorterType = 0;
 let animateBuildings = true;
@@ -30,20 +43,20 @@ let disabled = false;
 let showSorterChanger = true;
 let showDirectionChanger = true;
 let showOnlyCanAfford = true;
+let customSorter = defaultCustomSorter;
 // ==USER CHANGEABLE== (but not saved)
 let forwardDirection = true;
 let onlyCanAfford = false;
 // ==OTHER==
-const version = "1.3";
 let sorterElement = null;
 let changeables = null;
 let ObjectsToSort = [];
 let UpgradeTiers = {};
 let buildingAchievementTiers = [0, 1, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
 let products = null;
-//TODO: possibly add more sorting options? It's very easy, but idk what's another method of sorting.
 let sortersOptions = [
     {
+        enabled: true,
         text: "Built In",
         tooltip: {
             icon: [10, 0],
@@ -53,13 +66,12 @@ let sortersOptions = [
             quote: "Classic Ortiel's List."
         },
         sort: function(array){
-            array.sort(function(a, b){
-                if(forwardDirection) return a.id - b.id;
-                else return b.id - a.id;
-            });
+            array.sort((a, b) => a.id - b.id);
+            return array;
         }
     },
     {
+        enabled: true,
         text: "Amount",
         tooltip: {
             icon: [10, 33],
@@ -70,9 +82,11 @@ let sortersOptions = [
         },
         sort: function(array){
             array.sort((a, b) => a.amount - b.amount);
+            return array;
         }
     },
     {
+        enabled: true,
         text: "Price",
         tooltip: {
             icon: [3, 5],
@@ -82,11 +96,12 @@ let sortersOptions = [
             quote: "Where shall I spend this dough?"
         },
         sort: function(array){
-            if(forwardDirection) array.sort((a, b) => a.bulkPrice - b.bulkPrice);
-            else array.sort((a, b) => b.bulkPrice - a.bulkPrice);
+            array.sort((a, b) => a.bulkPrice - b.bulkPrice);
+            return array;
         }
     },
     {
+        enabled: true,
         text: "CPS",
         tooltip: {
             icon: [21, 6],
@@ -96,11 +111,12 @@ let sortersOptions = [
             quote: "So YOU are my most valuable possession."
         },
         sort: function(array){
-            if(!forwardDirection) array.sort((a, b) => a.storedTotalCps - b.storedTotalCps);
-            else array.sort((a, b) => b.storedTotalCps - a.storedTotalCps);
+            array.sort((a, b) => a.storedTotalCps - b.storedTotalCps);
+            return array;
         }
     },
     {
+        enabled: true,
         text: "Next Achievement",
         tooltip: {
             icon: [32, 33],
@@ -121,22 +137,16 @@ let sortersOptions = [
                 }
                 if(buildingAchievementTiers[aTier + 1]) aRemainder = buildingAchievementTiers[aTier + 1] - a.amount;
                 if(buildingAchievementTiers[bTier + 1]) bRemainder = buildingAchievementTiers[bTier + 1] - b.amount;
-                if(forwardDirection){
-                    if(isFinite(aRemainder) && isFinite(bRemainder)){
-                        return a.getSumPrice(aRemainder) - b.getSumPrice(bRemainder);
-                    }
-                    else return a.id - b.id;
+                if(isFinite(aRemainder) && isFinite(bRemainder)){
+                    return a.getSumPrice(aRemainder) - b.getSumPrice(bRemainder);
                 }
-                else{
-                    if(isFinite(aRemainder) && isFinite(bRemainder)){
-                        return b.getSumPrice(aRemainder) - a.getSumPrice(bRemainder);
-                    }
-                    else return b.id - a.id;
-                }
+                else return a.id - b.id;
             });
+            return array;
         }
     },
     {
+        enabled: true,
         text: "Next Upgrade",
         tooltip: {
             icon: [29, 7],
@@ -150,7 +160,6 @@ let sortersOptions = [
                 let aTier = UpgradeTiers[a.name];
                 let bTier = UpgradeTiers[b.name];
                 if(!aTier || !bTier) return 0;
-                //GET NEXT ATIER UNLOCK
                 let aTierNextUnlock = 0;
                 for(let i = 0; i < aTier.length; i++){
                     if(aTier[i] > a.amount){
@@ -173,6 +182,42 @@ let sortersOptions = [
 
                 return (a.getSumPrice(aTierNextUnlock - a.amount)) - (b.getSumPrice(bTierNextUnlock - b.amount));
             });
+            return array;
+        }
+    },
+    {
+        enabled: false,
+        text: "Custom Sorter",
+        tooltip: {
+            icon: [0, 4],
+            title: "Custom Sorter",
+            forwardDescription: "Who knows what this does, <b>you</b> coded it.",
+            reverseDescription: "Who knows what this does, <b>you</b> coded it. All I know is that reverse is enabled.",
+            quote: "Are you sure you know what you are doing?"
+        },
+        sort: function(array){
+            let toPassIn = Array.from(array);
+            let customSorterFunction = new Function(customSorter)();
+            let returnedArray = customSorterFunction(toPassIn);
+            let toReturnBack = toPassIn;
+            if(returnedArray instanceof Array){
+                toReturnBack = returnedArray;
+            }
+
+            //Insert back any objects that might have been skipped.
+            //No we cannot hide any Objects, the best you can do is make their display="none" and then set them at the bottom of the list.
+            let ids = [];
+            for(let i = 0;i<toReturnBack.length;i++){
+                if(toReturnBack[i] && typeof toReturnBack[i] === "object" && typeof toReturnBack[i].id != "undefined"){
+                    ids.push(toReturnBack[i].id);
+                }
+            }
+            for(let i = 0;i<array.length;i++){
+                if(!ids.includes(array[i].id)){
+                    toReturnBack.push(array[i]);
+                }
+            }
+            return toReturnBack;
         }
     }
 ];
@@ -198,6 +243,98 @@ let CSSFILE = `
         paddingLeft: 16px;
         marginBottom: 8px;
         background: linear-gradient(to right,rgba(0,0,0,0.5),rgba(0,0,0,0),rgba(0,0,0,0),rgba(0,0,0,0));
+    }
+    #ModBuildingSorter_customPrompt{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        background-color: rgba(0,0,0,0.5);
+    }
+    #ModBuildingSorter_actualPrompt{
+        width: 50%;
+        height: 50%;
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%,-50%);
+        background-color: rgba(0,0,0,1);
+    }
+    #ModBuildingSorter_actualPrompt .option{
+        font-size:135%;
+    }
+    #ModBuildingSorter_customPromptContent{
+        width:100%;
+        height:70%;
+        margin:0;
+        padding:0;
+    }
+    #ModBuildingSorter_customSorterCoderContainer{
+        width: 100%;
+        height: 100%;
+        border: none;
+        box-shadow: none;
+        margin: 5px;
+        text-shadow: none;
+    }
+    #ModBuildingSorter_customSorterCodeContainer{
+        width: 100%;
+        height: 90%;
+        font-size: 20px;
+        font-family: monospace;
+        color: white;
+        display: flex;
+        box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.5) inset, 0px 1px 2px rgba(0,0,0,0.5) inset;
+    }
+    #ModBuildingSorter_code:hover, #ModBuildingSorter_code:focus{
+        border:none;
+        box-shadow: none; 
+        outline:none;
+    }
+    #ModBuildingSorter_customSorterCoderLines{
+        width: 20px;
+        overflow: hidden;
+        color: #0ebb07;
+        border-radius: 10px 0 0 10px;
+        margin:0;
+    }
+    #ModBuildingSorter_customSorterCoderLines, #ModBuildingSorter_code{
+        background-color: #2b2b2b;
+        height: -webkit-fill-available;
+        resize: none;
+        border: none;
+        line-height: 16px;
+        box-shadow: none;
+    }
+    #ModBuildingSorter_code{
+        border-radius: 0 10px 10px 0;
+        color: #d7e2e2;
+        width: -webkit-fill-available;
+        tab-size: 4;
+        margin:0;
+        margin-left: -1px;
+    }
+    .ModBuildingSorter_codeStyle{
+        background-color: rgba(255,255,255,0.6);
+        color: #33ff00;
+        font-family: monospace;
+        padding: 1px 3px;
+        text-shadow: 1px 0.9px 3.1px #000;
+    }
+    .ModBuildingSorter_errorCodeStyle{
+        background-color: rgba(255,255,255,0.6);
+        color: #ffffff;
+        font-family: monospace;
+        padding: 1px 3px;
+        text-shadow: 1px 0.9px 3.1px #000;
+        float:left;
+       
+    }
+    .ModBuildingSorter_unsaved{
+        text-shadow: 1px 1px 1px #f00!important;
+        color: #ff8989!important;
     }
 `;
 let head = document.getElementsByTagName("head")[0];
@@ -273,6 +410,12 @@ function updateBuildingAnimations(){
 
 function sort(){
     if(disabled) return;
+    if(!sortersOptions[sorterType].enabled){
+        sorterType++;
+        if(sorterType === sortersOptions.length) sorterType = 0;
+        sort();
+        return;
+    }
     Game.tooltip.update();
     ObjectsToSort = Object.values(Game.Objects);
     ObjectsToSort.sort((a, b) => a.id - b.id);
@@ -285,12 +428,19 @@ function sort(){
             }
             else arrayToSort2.push(ObjectsToSort[i]);
         }
-        sortersOptions[sorterType].sort(arrayToSort1);
-        sortersOptions[sorterType].sort(arrayToSort2);
+        arrayToSort1 = sortersOptions[sorterType].sort(arrayToSort1);
+        arrayToSort2 = sortersOptions[sorterType].sort(arrayToSort2);
+        if(!forwardDirection){
+            arrayToSort1 = arrayToSort1.reverse();
+            arrayToSort2 = arrayToSort2.reverse();
+        }
         ObjectsToSort = arrayToSort1.concat(arrayToSort2);
     }
     else{
-        sortersOptions[sorterType].sort(ObjectsToSort);
+        ObjectsToSort = sortersOptions[sorterType].sort(ObjectsToSort);
+        if(!forwardDirection){
+            ObjectsToSort = ObjectsToSort.reverse();
+        }
     }
     let skips = 0;
     if(!disabled) products.style.display = "block";
@@ -312,11 +462,6 @@ function sort(){
     }
 }
 
-function applyFancyCss(bttn){
-    bttn.classList.add("option");
-    //USED TO HAVE OTHER STUFF, BUT THEN I FOUND THE CLASSLIST .option
-}
-
 function updateSorterButtons(){
     if(!changeables) return;
     changeables.children[0].innerText = sortersOptions[sorterType].text;
@@ -336,7 +481,7 @@ function addSorter(){
     }
     let selectHolder = document.createElement("div");
     sorterElement = selectHolder;
-    selectHolder.id= "ModBuildingSorter_selectHolder"
+    selectHolder.id = "ModBuildingSorter_selectHolder";
     let text = document.createElement("span");
     selectHolder.appendChild(text);
     text.innerText = "Sort Buildings By:";
@@ -350,8 +495,8 @@ function addSorter(){
     sorterButton.onclick = function(){
         sorterType++;
         if(sorterType === sortersOptions.length) sorterType = 0;
-        sorterButton.innerText = sortersOptions[sorterType].text;
         sort();
+        sorterButton.innerText = sortersOptions[sorterType].text;
 
     };
     changeables.appendChild(sorterButton);
@@ -379,9 +524,9 @@ function addSorter(){
 
     //Attach and update.
     updateSorterButtons();
-    applyFancyCss(sorterButton);
-    applyFancyCss(sorterDirectionButton);
-    applyFancyCss(affordableButton);
+    sorterButton.classList.add("option");
+    sorterDirectionButton.classList.add("option");
+    affordableButton.classList.add("option");
     products.insertBefore(selectHolder, products.children[1]);
 
 
@@ -397,6 +542,191 @@ function createSettingsButton(Title, Description, append, onclick){
     label.innerText = Description;
     append.appendChild(bttn);
     append.appendChild(label);
+}
+
+function createCustomPrompt(title){
+    let customPrompt = document.createElement("div");
+    customPrompt.id = "ModBuildingSorter_customPrompt";
+    let actualPrompt = document.createElement("div");
+    actualPrompt.id = "ModBuildingSorter_actualPrompt";
+    actualPrompt.classList.add("framed");
+    customPrompt.appendChild(actualPrompt);
+    let titleElem = document.createElement("div");
+    titleElem.innerText = title;
+    titleElem.style.textAlign = "center";
+    titleElem.style.margin = "20px";
+    titleElem.classList.add("title");
+    actualPrompt.appendChild(titleElem);
+    let content = document.createElement("div");
+    content.id = "ModBuildingSorter_customPromptContent";
+    actualPrompt.appendChild(content);
+    l("game").appendChild(customPrompt);
+    return {customPrompt, actualPrompt, content};
+}
+
+function popUpCustomSorterCoder(){
+    if(l("ModBuildingSorter_customPrompt")) return;
+    let prompt = createCustomPrompt("Create a Custom Sorter");
+    Game.mods.BuildingSorter.prompt = prompt;
+    let currentCodeIsValid = false;
+    //GENERATING CODER
+    let customSorterCoderContainer = document.createElement("div");
+    customSorterCoderContainer.id = "ModBuildingSorter_customSorterCoderContainer";
+    let text = document.createElement("span");
+    text.innerHTML = "For some documentation ";
+    let documentationClick = document.createElement("a");
+    documentationClick.innerText = "hover here";
+    Game.attachTooltip(documentationClick, function(){
+        return `<div style="padding:8px 4px;min-width:350px;">
+            <div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:-${32 * 48}px -${25 * 48}px;"></div>
+            <div class="name">Documentation</div>
+            <div class="tag" style="color:#fff;">[CustomSorter]</div>
+            <div class="line"></div>
+        </div>
+            <div class="description">You need to return a <span class="ModBuildingSorter_codeStyle">function</span> that then either: <br>1. Returns an array<br>2. Modifies the passed in array.<br>(if no array is returned in your function, it assumes you modified the array and uses the array it passed in)<br><br>Any items <i>missing</i> from the array will be appended at the end of the sorted array. The returned function will be called and pass in an <span class="ModBuildingSorter_codeStyle">array</span> that contains all the building objects. This array will be first sorted by their ID's before being passed in.<br><br>You should also know that <span class="ModBuildingSorter_codeStyle">Game</span> is a global variable that is the entire Cookie Clicker game. From this you have access to other mods, your cookies, cps, the current mod, etc.<br><br><small>Your code actually gets ran so you might want to test on another save, because you can delete/edit/add anything on the current save.</small></div>
+        <div class="line"></div>`;
+    }, "left");
+    text.appendChild(documentationClick);
+    let codeContainer = document.createElement("div");
+    codeContainer.id = "ModBuildingSorter_customSorterCodeContainer";
+    let lines = document.createElement("textarea");
+    lines.id = "ModBuildingSorter_customSorterCoderLines";
+    lines.disabled = true;
+    lines.spellcheck = false;
+    let code = document.createElement("textarea");
+    code.id = "ModBuildingSorter_code";
+    code.value = customSorter;
+    code.spellcheck = false;
+    codeContainer.appendChild(lines);
+    codeContainer.appendChild(code);
+    code.onscroll = function(e){
+        lines.scrollTop = code.scrollTop;
+    };
+    code.oninput = function(){
+        let split = code.value.split("\n");
+        let linesTxt = "";
+        for(let i = 0; i < split.length; i++){
+            linesTxt += (i + 1) + "\n";
+        }
+        lines.value = linesTxt;
+        currentCodeIsValid = false;
+        save.classList.add("ModBuildingSorter_unsaved");
+    };
+    code.onkeydown = function(e){
+        if(e.key == "Tab"){
+            e.preventDefault();
+            let start = this.selectionStart;
+            let end = this.selectionEnd;
+
+            // set textarea value to: text before caret + tab + text after caret
+            this.value = this.value.substring(0, start) +
+                "\t" + this.value.substring(end);
+
+            // put caret at right position again
+            this.selectionStart =
+                this.selectionEnd = start + 1;
+            this.oninput();
+        }
+    };
+    let otherContent = document.createElement("div");
+    otherContent.appendChild(text);
+    otherContent.style.height = "10%";
+    customSorterCoderContainer.appendChild(otherContent);
+    customSorterCoderContainer.appendChild(codeContainer);
+    prompt.content.appendChild(customSorterCoderContainer);
+
+    //CLOSE THE CODER
+    let close = document.createElement("a");
+    close.classList.add("option");
+    close.innerText = "Close";
+    close.onclick = function(){
+        if(customSorter.trim() != code.value.trim()){
+            Game.Prompt("<h3>Closing without saving</h3><div class=\"block\">Do you REALLY want to close without saving?<br><small>You will lose your code and revert to what was stored before.</small></div>", [["Close anyways.", "Game.ClosePrompt();Game.mods.BuildingSorter.prompt.customPrompt.remove();"], "Go Back!"]);
+        }
+        else prompt.customPrompt.remove();
+    };
+
+    //SAVE THE CODE
+    let save = document.createElement("a");
+    save.classList.add("option");
+    save.innerText = "Save";
+    save.onclick = function(){
+        //I embed user's code INSIDE a function. Thier code has to have a "return function(){}" at somepoint or else I tell them it's invalid.
+        let codeToRun = "console.log(\"Testing the file with user's code.\");\nfunction _ModBuildingSorter_testUsersFunction(){\n//============================\n\n" + code.value + "\n\n//============================\n}\n_ModBuildingSorter_testUsersFunction()";
+        let result;
+        let error = false;
+        let success = false;
+        try{
+            result = window.eval(codeToRun);//Why would I need to do window.eval instead of eval? Because userscript managers seem to override eval.
+            if(typeof result !== "function"){
+                Game.Notify("Error", `A function is required to be passed back. The type of the item that was passed back is: <span class='ModBuildingSorter_codeStyle'>${typeof result}</span>`, [32, 29], false);
+            }
+            else{
+                result = result(Object.values(Game.Objects).sort((a, b) => a.id - b.id));
+                success = true;
+            }
+        }
+        catch(e){
+            error = true;
+            result = e;
+        }
+        finally{
+            let throwResult = false;
+            //another try/catch. In case we can't display the error in a tidy message for the user.
+            try{
+                if(error){
+                    throwResult = true;
+                    let getColRow = result.stack.split("\n")[1].split("<anonymous>:")[1];
+                    if(getColRow && getColRow.length > 2){
+                        let column = parseInt(getColRow[2], 10) - 1;
+                        let row = parseInt(getColRow[0], 10) - 1;
+                        let lineOfCode = codeToRun.split("\n")[row];
+                        let spaces = "                                                  ^";
+                        if(lineOfCode.length > 30){
+                            let start = lineOfCode.substring(0, column);
+                            let end = lineOfCode.substring(column, lineOfCode.length);
+                            if(start.length > 15){
+                                start = start.substring(start.length - end.length, start.length);
+                            }
+                            if(end.length > 15){
+                                end = end.substring(0, 30 - start.length);
+                            }
+                            lineOfCode = start + end;
+                        }
+                        else spaces = spaces.substring(spaces.length - (column + 1), spaces.length);
+                        Game.Prompt(`<h3>An wild ERROR has appeared</h3><div class="block"><span>${result.message}</span><br><pre class="ModBuildingSorter_codeStyle" style="text-align: left">${lineOfCode}<br>${spaces}</pre><br><small>Error on Line: <span class="ModBuildingSorter_codeStyle">${getColRow[0]}:${getColRow[2]}</span>.</small></div>`, [["Close", "Game.ClosePrompt();"]]);
+                    }
+                    else{
+                        //WEIRDLY SyntaxErrors do not contain the line the error is located. I am forced to tell the user to try another website for debugging. I will not code an entire debugger just for this.
+                        Game.Prompt(`<h3>An wild ERROR has appeared</h3><div class="block"><span class="ModBuildingSorter_errorCodeStyle">${result.message}</span><br><br><span>Normally, with errors, I can point to what line the error is located. Unfortunately I am limited when it comes to this error.</span><br><small>Try <a target="_blank" href="https://extendsclass.com/javascript-fiddle.html">this website</a>.</small></div>`, [["Close", "Game.ClosePrompt();"]]);
+                    }
+                }
+                if(success){
+                    save.classList.remove("ModBuildingSorter_unsaved");
+                    Game.Notify("Success", `Successfully tested & saved your code.`, [22, 30], true);
+                    customSorter = code.value;
+                    Game.saveModData();
+                }
+            }
+            catch(e){
+                Game.Notify("Error", `${error ? "There is some errors in your code. Usually we help you by displaying your code's error message, but that crashed. Instead check the console for the errors." : "Something went wrong with saving. We don't know what happened. Check the console for the errors."}`, [32, 29], false);
+                if(throwResult){
+                    console.error("ERROR inside user's code:");
+                    console.error(result);
+                    console.error("\nERROR that prevented error message from displaying:");
+                }
+                throw e;
+            }
+            if(throwResult){//Needed to put it OUTSIDE the try/catch so this INTENTIONAL throw, doesn't trigger the catch
+                console.error("ERROR inside user's code:");
+                throw result;
+            }
+        }
+    };
+    prompt.actualPrompt.appendChild(close);
+    prompt.actualPrompt.appendChild(save);
+    code.oninput();
+    save.classList.remove("ModBuildingSorter_unsaved");
 }
 
 function addSettings(){
@@ -415,7 +745,7 @@ function addSettings(){
     let buttonsHolder = document.createElement("div");
     buttonsHolder.classList = "listing";
     settingsTitle.classList.add("title");
-    settingsTitle.id = "ModBuildingSorter_SettingsTitle"
+    settingsTitle.id = "ModBuildingSorter_SettingsTitle";
     settingsTitle.innerText = "Buildings Sorter";
     settings.appendChild(settingsTitle);
     let description = document.createElement("div");
@@ -441,14 +771,29 @@ function addSettings(){
         this.innerText = showOnlyCanAfford ? "Showing Affordable" : "Hiding Affordable";
         updateSorterButtons();
     });
+    buttonsHolder.appendChild(document.createElement("br"));
+    let bttn = document.createElement("a");
+    bttn.classList.add("option");
+    bttn.innerText = "Edit Custom Sorter";
+    bttn.onclick = function(){
+        popUpCustomSorterCoder();
+    };
+    let label = document.createElement("label");
+    label.innerText = "Allows YOU the user to code in a sorter to suit your own needs.";
+    buttonsHolder.appendChild(bttn);
+    buttonsHolder.appendChild(label);
+    createSettingsButton(sortersOptions[6].enabled ? "Custom Sorter Enabled" : "Custom Sorter Disabled", "Enable/Disable your custom sorter.", buttonsHolder, function(){
+        sortersOptions[6].enabled = !sortersOptions[6].enabled;
+        this.innerText = sortersOptions[6].enabled ? "Custom Sorter Enabled" : "Custom Sorter Disabled";
+    });
     createSettingsButton(animateBuildings ? "Animating Buildings" : "Instant Buildings", "Whether the buildings smoothly move when sorting options change or update.", buttonsHolder, function(){
         animateBuildings = !animateBuildings;
         this.innerText = animateBuildings ? "Animating Buildings" : "Instant Buildings";
         updateBuildingAnimations();
     });
-    createSettingsButton(disabled ? "Disabled" : "Enabled", "Whether to temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
+    createSettingsButton(disabled ? "Mod Disabled" : "Mod Enabled", "Whether to temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
         disabled = !disabled;
-        this.innerText = disabled ? "Disabled" : "Enabled";
+        this.innerText = disabled ? "Mod Disabled" : "Mod Enabled";
         sort();
         products.style.display = "grid";//CookieMonster requires this. I'd rather not break a well known mod. But shame it doesn't update this itself.
         sorterElement.style.display = disabled ? "none" : "flex";
@@ -463,8 +808,10 @@ function addSettings(){
         settingsHolder.insertBefore(settings, settingsHolder.lastElementChild);
     }
 }
-
 const BuildingSorter = {
+
+    DisableNotif: 0,
+    prompt: null,
     init: function(){
         Game.registerHook("logic", function(value){
             addSettings();
@@ -480,17 +827,35 @@ const BuildingSorter = {
     },
 
     save: function(){
-        return `${sorterType}|${animateBuildings ? 1 : 0}|${showSorterChanger ? 1 : 0}|${showDirectionChanger ? 1 : 0}|${showOnlyCanAfford ? 1 : 0}|${this.DisableNotif}`;
+        let enabled =``;
+        for(let i =0;i<sortersOptions.length;i++){
+            enabled+=sortersOptions[i].enabled ? 1:0;
+
+        }
+        return `${sorterType}ô${animateBuildings ? 1 : 0}${showSorterChanger ? 1 : 0}${showDirectionChanger ? 1 : 0}${showOnlyCanAfford ? 1 : 0}${this.DisableNotif ? 1:0}ô${enabled}ô${customSorter === defaultCustomSorter ? "":customSorter}`;
     },
-    DisableNotif: 0,
     load: function(str){
-        let arr = str.split("|");
-        if(arr[0] && !isNaN(arr[0])) sorterType = parseInt(arr[0], 10) || 0;
-        if(arr[1] && !isNaN(arr[1])) animateBuildings = parseInt(arr[1], 10) === 1;
-        if(arr[2] && !isNaN(arr[2])) showSorterChanger = parseInt(arr[2], 10) === 1;
-        if(arr[3] && !isNaN(arr[3])) showDirectionChanger = parseInt(arr[3], 10) === 1;
-        if(arr[4] && !isNaN(arr[4])) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
-        if(arr[5] && !isNaN(arr[5])) this.DisableNotif = parseInt(arr[5], 10);
+        console.log(str);
+        if(arr[0]) sorterType = parseInt(arr[0], 10) || 0;
+        if(arr[1]) {
+            let booleans = arr[1].split("");
+            if(booleans[0]) animateBuildings = parseInt(booleans[0], 10) === 1;
+            if(booleans[1]) showSorterChanger = parseInt(booleans[1], 10) === 1;
+            if(booleans[2]) showDirectionChanger = parseInt(booleans[2], 10) === 1;
+            if(booleans[3]) showOnlyCanAfford = parseInt(booleans[3], 10) === 1;
+            if(booleans[4]) this.DisableNotif = parseInt(booleans[4], 10) === 1;
+        }
+        if(arr[2]) {
+            let enabled = arr[2].split("");
+            for(let i =0;i<enabled.length;i++){
+                if(sortersOptions[i]){
+                    sortersOptions[i].enabled = (parseInt(enabled[i],10) === 1)
+                }
+            }
+        }
+        if(arr[3]){
+            customSorter = arr[3];
+        }
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
         if(isNaN(sorterType)) sorterType = 0;
