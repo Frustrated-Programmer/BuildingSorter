@@ -34,7 +34,7 @@ let showOnlyCanAfford = true;
 let forwardDirection = true;
 let onlyCanAfford = false;
 // ==OTHER==
-const version = "1.2";
+const version = "1.3";
 let sorterElement = null;
 let changeables = null;
 let ObjectsToSort = [];
@@ -57,6 +57,19 @@ let sortersOptions = [
                 if(forwardDirection) return a.id - b.id;
                 else return b.id - a.id;
             });
+        }
+    },
+    {
+        text: "Amount",
+        tooltip: {
+            icon: [10, 33],
+            title: "Amount",
+            forwardDescription: "Places the buildings you own the <b>most</b> of at the top.",
+            reverseDescription: "Places the buildings you own the <b>least</b> of at the top.",
+            quote: "Ever heard of something called, a Monopoly?"
+        },
+        sort: function(array){
+            array.sort((a, b) => a.amount - b.amount);
         }
     },
     {
@@ -187,10 +200,10 @@ let CSSFILE = `
         background: linear-gradient(to right,rgba(0,0,0,0.5),rgba(0,0,0,0),rgba(0,0,0,0),rgba(0,0,0,0));
     }
 `;
-let head = document.getElementsByTagName('head')[0];
-let style = document.createElement('style');
-style.id = "ModBuildingSorter_CSS"
-style.type = 'text/css';
+let head = document.getElementsByTagName("head")[0];
+let style = document.createElement("style");
+style.id = "ModBuildingSorter_CSS";
+style.type = "text/css";
 style.innerHTML = CSSFILE;
 head.appendChild(style);
 
