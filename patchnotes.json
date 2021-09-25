@@ -1,0 +1,17 @@
+{
+	"1.0": {
+		"title":"Initial commit",
+		"message": "Initial commit",
+		"html": "Initial commit"
+	},
+	"1.1": {
+		"title":"Bug Fixes",
+		"message": "Settings will no longer spazz out\nAffordable being enabled is now saved.",
+		"html": "<ul><li>Settings will no longer spazz out</li><li>Affordable being enabled is now saved.</li></ul>"
+	},
+	"1.2": {
+		"title":"Improvements",
+		"message": "Startup Notification can now be disabled\nSorters know about bulk buying now",
+		"html": "<ul><li>Startup Notification can now be disabled</li><li>Sorters know about bulk buying now</li></ul>"
+	}
+}
