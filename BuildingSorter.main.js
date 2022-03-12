@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      1.2
+// @version      2.0
 // @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
-// @icon         data:image/png;base64,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
+// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAKlBMVEWOOT9GUDHDv5BbGyqUbD7EaVf///+MjF5fMyB2Si08Fg5IHxMgDgr////9CbZGAAAADnRSTlP/////////////////AEXA3MgAAAFUSURBVHja7Jdtr4MgDIWBeaWl9f//3VtelosboCtbcpd45IPG9AHPKUbNNilzAb4CwFlqAHtrvXeeJwFmAnC7GfMzATDvAbzqwZ/1bDQmVtbrUqis16VQWa9LobJel0JlvS6Fyvorhe9LgU+pD2DoaMFa/DnAxqEjBCosIh55QB0tCGV6wAMAc2MkAKXjEBC4Mf4J4H58zMRx91EV464bzYtN9NRM7wOc6UJodGMFoHZ9ZSA2jNwBGvZDBpA0AHlRPu0CnucvAJAeknK7+njaBzCHhwH3R5B659ZVCKgByMqlXhSXoAZYa50dA/oe5BVY55UriB64NQNUHhAlwir1pEpBsks5yvyg6oOzndhbwX4zkMYD2X9ZiDoPEOV5MgA0mykC4vvyANDfzhkQCSPA4IVaAEKYBFAYAEK7PiySm+RYbkO6agFOfl08fmNcP57b9ivAAE0ItTfDUzdYAAAAAElFTkSuQmCC
 // ==/UserScript==
 /**
- Building Sorter. A program designed sort the building list
+ Building Sorter. A program designed to sort the Cookie Clicker building list
  Copyright (C) 2021  Elijah Anderson<contact@frustratedprogrammer.com>
 
  This program is free software: you can redistribute it and/or modify
@@ -23,18 +23,20 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  **/
 
-//This is a passion project of mine. These are my ideas for how to improve. But without some donations or incredible recognition(I got 250 upvotes when I released my mod, that inspired me to release v2), I probably won't implement these. Feel free to make a PR I'll
+//This is a just passion project of mine. These are my ideas for how to improve. But without some donations or incredible recognition(I got 250 upvotes when I released my mod, that inspired me to release v2), I probably won't implement these. Feel free to make a PR I'll probably accept it.
 //TODO:
-// allow users to make MORE than 1 custom sorter, (Would need to look into finding other ways to save their custom functions so my mod doesn't have a massive save file)
-// allow users to put a name & description for their custom sorters.
-// allow users to export/import custom sorters
+// allow users to make MORE than 1 custom sorter.
+//  - look into finding other ways to save their custom functions so my mod doesn't have a massive save file
+//  - allow users to put a name & description for their custom sorters.
+//  - allow users to export/import custom sorters
 // implement color coding for the custom coder (so it's more like an IDE)
-// allow dragging/dropping sorting.
+// allow dragging/dropping sorting option.
 // implement adjustments to some sorters depending on whether the user is "selling" or "buying" (currently everything assumes you are buying)
 // update next achievement and next upgrade, to exclude achievements/upgrades you already own. (Prestige or Selling can reproduce)
 
 // CONSTANTS
-const version = "1.5";
+const version = "2.0";
+const uniqueCharacter = "ô"
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==SAVED SETTINGS==
 let sorterType = 0;
@@ -48,6 +50,8 @@ let customSorter = defaultCustomSorter;
 let forwardDirection = true;
 let onlyCanAfford = false;
 // ==OTHER==
+let CookieMonsterEnabled = false;
+let FrozenCookiesEnabled = false;
 let sorterElement = null;
 let changeables = null;
 let ObjectsToSort = [];
@@ -57,7 +61,9 @@ let products = null;
 let sortersOptions = [
     {
         enabled: true,
+        sorterFrom:"BuildingSorter",
         text: "Built In",
+        description: "Sort's building's by their ID's number. This ranks them in order how they were designed to be displayed. This theoretically works with mods that adds new options so long as their ID is a number.",
         tooltip: {
             icon: [10, 0],
             title: "Built In",
@@ -72,12 +78,14 @@ let sortersOptions = [
     },
     {
         enabled: true,
+        sorterFrom:"BuildingSorter",
         text: "Amount",
+        description: "Sort's building's by showing the buildings that you own less of towards the top.",
         tooltip: {
             icon: [10, 33],
             title: "Amount",
-            forwardDescription: "Places the buildings you own the <b>most</b> of at the top.",
-            reverseDescription: "Places the buildings you own the <b>least</b> of at the top.",
+            forwardDescription: "Places the buildings you own the <b>least</b> of at the top.",
+            reverseDescription: "Places the buildings you own the <b>most</b> of at the top.",
             quote: "Ever heard of something called, a Monopoly?"
         },
         sort: function(array){
@@ -87,7 +95,9 @@ let sortersOptions = [
     },
     {
         enabled: true,
+        sorterFrom:"BuildingSorter",
         text: "Price",
+        description: "Grabs each building's current price for buying only 1 of that building, then ranks them based on lowest price.",
         tooltip: {
             icon: [3, 5],
             title: "Price",
@@ -102,7 +112,9 @@ let sortersOptions = [
     },
     {
         enabled: true,
+        sorterFrom:"BuildingSorter",
         text: "CPS",
+        description: "Grabs how much each building is producing in CPS, and ranks them based on which is currently producing the most.",
         tooltip: {
             icon: [21, 6],
             title: "CPS",
@@ -117,7 +129,9 @@ let sortersOptions = [
     },
     {
         enabled: true,
+        sorterFrom:"BuildingSorter",
         text: "Next Achievement",
+        description: "Calculates how many of each building you need to buy to unlock the next achievement, and ranks them from cheapest total cost of buying all said buildings",
         tooltip: {
             icon: [32, 33],
             title: "Next Achievement",
@@ -147,7 +161,9 @@ let sortersOptions = [
     },
     {
         enabled: true,
+        sorterFrom:"BuildingSorter",
         text: "Next Upgrade",
+        description: "Calculates how many of each building you need to buy to unlock the next upgrade, and ranks them from cheapest total cost of buying all said buildings",
         tooltip: {
             icon: [29, 7],
             title: "Next Upgrade",
@@ -187,7 +203,9 @@ let sortersOptions = [
     },
     {
         enabled: false,
+        sorterFrom:"BuildingSorter",
         text: "Custom Sorter",
+        description: "The custom sorter option that you can code yourself and then run.",
         tooltip: {
             icon: [0, 4],
             title: "Custom Sorter",
@@ -207,19 +225,66 @@ let sortersOptions = [
             //Insert back any objects that might have been skipped.
             //No we cannot hide any Objects, the best you can do is make their display="none" and then set them at the bottom of the list.
             let ids = [];
-            for(let i = 0;i<toReturnBack.length;i++){
+            for(let i = 0; i < toReturnBack.length; i++){
                 if(toReturnBack[i] && typeof toReturnBack[i] === "object" && typeof toReturnBack[i].id != "undefined"){
                     ids.push(toReturnBack[i].id);
                 }
             }
-            for(let i = 0;i<array.length;i++){
+            for(let i = 0; i < array.length; i++){
                 if(!ids.includes(array[i].id)){
                     toReturnBack.push(array[i]);
                 }
             }
             return toReturnBack;
         }
-    }
+    },
+    {
+        enabled: false,
+        sorterFrom:"CookieMonster",
+        enabledIfMyModIsEnabled: false,
+        text: "Payback Period",
+        description: "Sort the display of buildings by CookieMonster's Payback Period",
+        tooltip: {
+            icon: [10, 28],
+            title: "CookieMonster's Payback Period",
+            forwardDescription: "Sort the display of buildings by CookieMonster's lowest <b>P</b>ayback <b>P</b>eriod.",
+            reverseDescription: "Sort the display of buildings by CookieMonster's highest <b>P</b>ayback <b>P</b>eriod.",
+            quote: "C is for cookie that's good enough for me.<br>-Cookie Monster"
+        },
+        sort: function(array){
+            if(!CookieMonsterEnabled) return array;
+            let objectToUse = CookieMonsterData.Objects1;
+            if(Game.buyBulk === 10) objectToUse = CookieMonsterData.Objects10;
+            if(Game.buyBulk === 100) objectToUse = CookieMonsterData.Objects100;
+            array.sort((a, b) => {
+                if(objectToUse[a.name] && objectToUse[b.name]) return objectToUse[a.name].pp - objectToUse[b.name].pp;
+                else return 0;
+            })
+            return array;
+        }
+    },
+    {
+        enabled: false,
+        sorterFrom:"FrozenCookies",
+        enabledIfMyModIsEnabled: false,
+        text: "Efficiency",
+        description: "Sort the display of buildings by FrozenCookie's Efficiency recommendation.",
+        tooltip: {
+            icon: [10, 2],
+            title: "FrozenCookie's Efficiency",
+            forwardDescription: "Sort the display of buildings by FrozenCookie's most efficient recommendation.",
+            reverseDescription: "Sort the display of buildings by FrozenCookie's worst efficient recommendation.",
+            quote: "Cookie Dough tastes better Frozen. Hence FrozenCookies"
+        },
+        sort: function(array){
+            if(!FrozenCookiesEnabled) return array;
+            array.sort((a, b) => {
+                if(FrozenCookies.caches.buildings[a.id] && FrozenCookies.caches.buildings[b.id]) return FrozenCookies.caches.buildings[a.id].efficiency - FrozenCookies.caches.buildings[b.id].efficiency;
+                else return 0;
+            })
+            return array;
+        }
+    },
 ];
 // ==Create CSS==
 let CSSFILE = `
@@ -231,17 +296,17 @@ let CSSFILE = `
     }
     #ModBuildingSorter_selectHolder span{
         z-index: 1000;
-        text-shadow: 0px 1px 1px #360e00, 0px -1px 1px #360e00, 1px 0px 1px #360e00, -1px 0px 1px #360e00
+        text-shadow: 0px 1px 1px #360e00, 0px -1px 1px #360e00, 1px 0px 1px #360e00, -1px 0px 1px #360e00;
         font-weight: bold;
         color: #F6DAB8;
         opacity: 1;
-        lineHeight: 22px;
-        fontVariant: small-caps;
+        line-height: 22px;
+        font-variant: small-caps;
     }
     #ModBuildingSorter_SettingsTitle{
-        fontSize: 22px;
-        paddingLeft: 16px;
-        marginBottom: 8px;
+        font-size: 22px;
+        padding-left: 16px;
+        margin-bottom: 8px;
         background: linear-gradient(to right,rgba(0,0,0,0.5),rgba(0,0,0,0),rgba(0,0,0,0),rgba(0,0,0,0));
     }
     #ModBuildingSorter_customPrompt{
@@ -336,6 +401,9 @@ let CSSFILE = `
         text-shadow: 1px 1px 1px #f00!important;
         color: #ff8989!important;
     }
+    #ModBuildingSorter_HiddenUpdateLinker, #ModBuildingSorter_HiddenPatchLinker{
+        display:none;
+    }
 `;
 let head = document.getElementsByTagName("head")[0];
 let style = document.createElement("style");
@@ -343,6 +411,18 @@ style.id = "ModBuildingSorter_CSS";
 style.type = "text/css";
 style.innerHTML = CSSFILE;
 head.appendChild(style);
+
+function incrementSorterType(){
+    sorterType++;
+    if(sorterType === sortersOptions.length) sorterType = 0;
+    if(!sortersOptions[sorterType].enabled){
+        incrementSorterType();
+    }
+    else{
+        changeables.children[0].innerText = sortersOptions[sorterType].text;
+        sort();
+    }
+}
 
 function directionButtonTooltip(){
     return `<div style="padding:8px 4px;min-width:350px;">
@@ -396,6 +476,7 @@ function createUpgradeTiers(){
 
 function updateBuildingAnimations(){
     let timer = animateBuildings ? "0.5s" : "0ms";
+    if(disabled) timer = "0ms";
     for(let i = 0; i < ObjectsToSort.length; i++){
         ObjectsToSort[i].l.style["-webkit-transition"] = `all ${timer} ease`;
         ObjectsToSort[i].l.style["-moz-transition"] = `all ${timer} ease`;
@@ -409,12 +490,16 @@ function updateBuildingAnimations(){
 }
 
 function sort(){
-    if(disabled) return;
-    if(!sortersOptions[sorterType].enabled){
-        sorterType++;
-        if(sorterType === sortersOptions.length) sorterType = 0;
-        sort();
+    if(disabled){
+        ObjectsToSort = Object.values(Game.Objects);
+        for(let i = 0; i < ObjectsToSort.length; i++){
+            ObjectsToSort[i].l.style.top = "0px";
+            ObjectsToSort[i].l.style.position = "inherit";
+        }
         return;
+    }
+    if(!sortersOptions[sorterType].enabled){
+        incrementSorterType();
     }
     Game.tooltip.update();
     ObjectsToSort = Object.values(Game.Objects);
@@ -446,19 +531,12 @@ function sort(){
     if(!disabled) products.style.display = "block";
     for(let i = 0; i < ObjectsToSort.length; i++){
         let obj = ObjectsToSort[i].l;
-
         if(obj.classList.contains("toggledOff")){
             skips++;
             continue;
         }
-        if(disabled){
-            obj.style.top = 0;
-            obj.style.position = "";
-        }
-        else{
-            obj.style.top = (obj.clientHeight * ((i - skips) - ObjectsToSort[i].id)) + "px";
-            obj.style.position = "relative";
-        }
+        obj.style.top = (obj.clientHeight * ((i - skips) - ObjectsToSort[i].id)) + "px";
+        obj.style.position = "relative";
     }
 }
 
@@ -492,10 +570,9 @@ function addSorter(){
     // the MAIN button          | Determines what sorting method to use.
     let sorterButton = document.createElement("a");
     sorterButton.style.width = "100px";
+    sorterButton.style.whiteSpace = "nowrap";
     sorterButton.onclick = function(){
-        sorterType++;
-        if(sorterType === sortersOptions.length) sorterType = 0;
-        sort();
+        incrementSorterType();
         sorterButton.innerText = sortersOptions[sorterType].text;
 
     };
@@ -583,7 +660,7 @@ function popUpCustomSorterCoder(){
             <div class="tag" style="color:#fff;">[CustomSorter]</div>
             <div class="line"></div>
         </div>
-            <div class="description">You need to return a <span class="ModBuildingSorter_codeStyle">function</span> that then either: <br>1. Returns an array<br>2. Modifies the passed in array.<br>(if no array is returned in your function, it assumes you modified the array and uses the array it passed in)<br><br>Any items <i>missing</i> from the array will be appended at the end of the sorted array. The returned function will be called and pass in an <span class="ModBuildingSorter_codeStyle">array</span> that contains all the building objects. This array will be first sorted by their ID's before being passed in.<br><br>You should also know that <span class="ModBuildingSorter_codeStyle">Game</span> is a global variable that is the entire Cookie Clicker game. From this you have access to other mods, your cookies, cps, the current mod, etc.<br><br><small>Your code actually gets ran so you might want to test on another save, because you can delete/edit/add anything on the current save.</small></div>
+            <div class="description">You need to return a <span class="ModBuildingSorter_codeStyle">function</span> that then either: <br>1. Returns an array<br>2. Modifies the passed in array.<br>(if no array is returned in your function, it assumes you modified the array and uses the array it passed in)<br><br>Any items <i>missing</i> from the array will be appended at the end of the sorted array. The returned function will be called with an <span class="ModBuildingSorter_codeStyle">array</span> passed in that contains all the building objects. This array will be first sorted by their ID's before being passed in.<br><br>You should also know that <span class="ModBuildingSorter_codeStyle">Game</span> is a global variable that is the entire Cookie Clicker game. From this you have access to other mods, your cookies, cps, the current mod, etc.<br><br><small>Your code actually gets ran so you might want to test on another save, because you can delete/edit/add anything on the current save.</small></div>
         <div class="line"></div>`;
     }, "left");
     text.appendChild(documentationClick);
@@ -607,6 +684,10 @@ function popUpCustomSorterCoder(){
         let linesTxt = "";
         for(let i = 0; i < split.length; i++){
             linesTxt += (i + 1) + "\n";
+        }
+        //REMOVE ô from the code, it cannot exist in the customSorter due to it being my unique character. Chances of it ever being used is down to nil. If there is ever a complaint, it might change.
+        while(code.value.indexOf(uniqueCharacter) !== -1){
+            code.value = code.value.substring(0,code.value.indexOf(uniqueCharacter)) + code.value.substring(code.value.indexOf(uniqueCharacter)+1, code.value.length);
         }
         lines.value = linesTxt;
         currentCodeIsValid = false;
@@ -750,11 +831,57 @@ function addSettings(){
     settings.appendChild(settingsTitle);
     let description = document.createElement("div");
     description.classList.add("listing");
-    description.innerHTML = `<b style="opacity:1">Built In: </b><label>Sort's building's by their ID's number. This ranks them in order how they were designed to be displayed. This theoretically works with mods that adds new options so long as their <i>ID</i> is a number.</label><br><br>
-<b style="opacity:1">Price: </b><label>Grabs each building's current price for buying only 1 of that building, then ranks them based on lowest price.</label><br><br>
-<b style="opacity:1">CPS: </b><label>Grabs how much each building is producing in CPS, and ranks them based on which is currently producing the most.</label><br><br>
-<b style="opacity:1">Next Achievement: </b><label>Calculates how many of each building you need to buy to unlock the next <i>achievement</i>, and ranks them from cheapest total cost of buying all said buildings</label><br><br>
-<b style="opacity:1">Next Upgrade: </b><label>Calculates how many of each building you need to buy to unlock the next <i>upgrade</i>, and ranks them from cheapest total cost of buying all said buildings</label>`;
+    for(let i = 0; i < sortersOptions.length; i++){
+        if(!CookieMonsterEnabled && sortersOptions[i].sorterFrom === "CookieMonster") continue;
+        if(!FrozenCookiesEnabled && sortersOptions[i].sorterFrom === "FrozenCookies") continue;
+        if(i !== 0){
+            description.appendChild(document.createElement("br"));
+            description.appendChild(document.createElement("br"));
+        }
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = sortersOptions[i].enabled;
+        description.appendChild(checkbox);
+        let bolded = document.createElement("b");
+        bolded.style.opacity = sortersOptions[i].enabled ? "1" : "0.5";
+        bolded.innerText = sortersOptions[i].text;
+        description.appendChild(bolded);
+        if(sortersOptions[i].text === "Custom Sorter"){
+            let customSorterButton = document.createElement("a");
+            customSorterButton.classList.add("option");
+            customSorterButton.innerText = "Edit";
+            customSorterButton.onclick = function(){
+                popUpCustomSorterCoder();
+            };
+            description.appendChild(customSorterButton);
+        }
+        let label = document.createElement("label");
+        label.innerText = sortersOptions[i].description;
+        label.style.opacity = sortersOptions[i].enabled ? "0.5" : "0.25";
+        description.appendChild(label);
+        checkbox.oninput = function(){
+            sortersOptions[i].enabled = this.checked;
+            if(this.checked === false){
+                let atLeastOneEnabled = false;
+                for(let j = 0; j < sortersOptions.length; j++){
+                    if(sortersOptions[j].enabled){
+                        atLeastOneEnabled = true;
+                        break;
+                    }
+                }
+                if(!atLeastOneEnabled){
+                    sortersOptions[i].enabled = true;
+                    this.checked = true;
+                    Game.Notify("Can't do that.", `You have to have at least ONE sorter enabled at all times. If you'd like to disable the sorter, the Building Sorter settings page has a DISABLE MOD option.`, [1, 7], false);
+                }
+            }
+            if(!sortersOptions[i].enabled && sorterType === i){
+                incrementSorterType();
+            }
+            bolded.style.opacity = sortersOptions[i].enabled ? "1" : "0.5";
+            label.style.opacity = sortersOptions[i].enabled ? "0.5" : "0.25";
+        };
+    }
     settings.appendChild(description);
     createSettingsButton(showSorterChanger ? "Showing Sorter" : "Hiding Sorter", "Whether to show/hide the sorter option on the sidebar for quick adjustments.", buttonsHolder, function(){
         showSorterChanger = !showSorterChanger;
@@ -771,46 +898,79 @@ function addSettings(){
         this.innerText = showOnlyCanAfford ? "Showing Affordable" : "Hiding Affordable";
         updateSorterButtons();
     });
-    buttonsHolder.appendChild(document.createElement("br"));
-    let bttn = document.createElement("a");
-    bttn.classList.add("option");
-    bttn.innerText = "Edit Custom Sorter";
-    bttn.onclick = function(){
-        popUpCustomSorterCoder();
-    };
-    let label = document.createElement("label");
-    label.innerText = "Allows YOU the user to code in a sorter to suit your own needs.";
-    buttonsHolder.appendChild(bttn);
-    buttonsHolder.appendChild(label);
-    createSettingsButton(sortersOptions[6].enabled ? "Custom Sorter Enabled" : "Custom Sorter Disabled", "Enable/Disable your custom sorter.", buttonsHolder, function(){
-        sortersOptions[6].enabled = !sortersOptions[6].enabled;
-        this.innerText = sortersOptions[6].enabled ? "Custom Sorter Enabled" : "Custom Sorter Disabled";
-    });
     createSettingsButton(animateBuildings ? "Animating Buildings" : "Instant Buildings", "Whether the buildings smoothly move when sorting options change or update.", buttonsHolder, function(){
         animateBuildings = !animateBuildings;
         this.innerText = animateBuildings ? "Animating Buildings" : "Instant Buildings";
         updateBuildingAnimations();
     });
-    createSettingsButton(disabled ? "Mod Disabled" : "Mod Enabled", "Whether to temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
+    createSettingsButton(disabled ? "Mod Disabled" : "Mod Enabled", "Temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
         disabled = !disabled;
         this.innerText = disabled ? "Mod Disabled" : "Mod Enabled";
-        sort();
         products.style.display = "grid";//CookieMonster requires this. I'd rather not break a well known mod. But shame it doesn't update this itself.
         sorterElement.style.display = disabled ? "none" : "flex";
+        updateBuildingAnimations();
+        sort();
+    });
+    createSettingsButton(BuildingSorter.CheckForUpdates ? "Allow check for updates" : "Stay offline", "Whether to check if the mod has some updates or not.", buttonsHolder, function(){
+        BuildingSorter.CheckForUpdates = !BuildingSorter.CheckForUpdates;
+        this.innerText = BuildingSorter.CheckForUpdates ? "Check for updates" : "Stay offline";
     });
     settings.append(buttonsHolder);
-//ADD SETTINGS
-//BEFORE cookieMonster's settings though, they have a massive list of settings.
+/**ADD SETTINGS**/
+//BEFORE CookieMonster's settings though, they have a massive list of settings.
+//AND due to CookieMonster way of allowing user to close groups, any settings placed after their settings gets screwed up every redraw
     if(l("cookieMonsterFrameworkMenuSection")){
         settingsHolder.insertBefore(settings, l("cookieMonsterFrameworkMenuSection"));
+    }
+    else if(l("cookieMonsterModMenuSection")){
+        settingsHolder.insertBefore(settings, l("cookieMonsterModMenuSection"));
     }
     else{
         settingsHolder.insertBefore(settings, settingsHolder.lastElementChild);
     }
 }
-const BuildingSorter = {
 
+function updateNoPatchNote(oldVersion, newVersion){
+    setTimeout(function(){//wait 30 secs before showing. To not overflow the notification bar.
+        if(version.toLowerCase() === newVersion.toLowerCase()){//Show what changed since last time
+            Game.Notify("Updated Building Sorter", `The mod 'Building Sorter' loaded from <span class="ModBuildingSorter_codeStyle">v${oldVersion}</span> to <span class="ModBuildingSorter_codeStyle">v${version}</span>. Patchnotes failed to load, but you can check them out <a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md">here</a>.`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+        }
+        else{
+            if(version.toLowerCase() === newVersion.toLowerCase()){//Advise the user to upgrade.
+                Game.Notify("Update Building Sorter", `The mod 'Building Sorter' is currently <span class="ModBuildingSorter_codeStyle">v${version}</span>, the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>. You can upgrade <a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter">here</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+            }
+        }
+    }, 10000);
+}
+
+function updateWithPatchNote(oldVersion, newVersion, patchnotes){
+    let patchnote = patchnotes[newVersion];
+    if(!patchnote){
+        updateNoPatchNote(newVersion);
+        return;
+    }
+    Game.mods.BuildingSorter.showPatchNotes = function(){
+        if(version.toLowerCase() === newVersion.toLowerCase()){//Show patchnotes
+            Game.Prompt(`<h3>Updated Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md" id="ModBuildingSorter_HiddenPatchLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["See More", "l('ModBuildingSorter_HiddenPatchLinker').click()"]]);
+        }
+        else{//recommend user updates.
+            Game.Prompt(`<h3>Update Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter" id="ModBuildingSorter_HiddenUpdateLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["Update", "l('ModBuildingSorter_HiddenUpdateLinker').click()"]]);
+        }
+    };
+    setTimeout(function(){//wait 30 secs before showing. To not overflow the notification bar.
+        if(version.toLowerCase() === newVersion.toLowerCase()){//Show patchnotes
+            Game.Notify("Updated Building Sorter", `The mod 'Building Sorter' updated from <span class="ModBuildingSorter_codeStyle">v${oldVersion}</span> the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>.<a style="float:right;" onclick="Game.mods.BuildingSorter.showPatchNotes();==CLOSETHIS()==">Whats new?</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+        }
+        else{//recommend user updates.
+            Game.Notify("Update Building Sorter", `The mod 'Building Sorter' is currently <span class="ModBuildingSorter_codeStyle">v${version}</span> the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>.<a style="float:right;" onclick="Game.mods.BuildingSorter.showPatchNotes();==CLOSETHIS()==">Whats new?</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+        }
+    }, 10000);
+}
+
+const BuildingSorter = {
+    CheckForUpdates: 1,
     DisableNotif: 0,
+    showPatchNotes: null,
     prompt: null,
     init: function(){
         Game.registerHook("logic", function(value){
@@ -827,34 +987,75 @@ const BuildingSorter = {
     },
 
     save: function(){
-        let enabled =``;
-        for(let i =0;i<sortersOptions.length;i++){
-            enabled+=sortersOptions[i].enabled ? 1:0;
-
+        let enabled = ``;
+        for(let i = 0; i < sortersOptions.length; i++){
+            enabled += (sortersOptions[i].enabled || sortersOptions[i].enabledIfMyModIsEnabled) ? `1` : `0`;
         }
-        return `${sorterType}ô${animateBuildings ? 1 : 0}${showSorterChanger ? 1 : 0}${showDirectionChanger ? 1 : 0}${showOnlyCanAfford ? 1 : 0}${this.DisableNotif ? 1:0}ô${enabled}ô${customSorter === defaultCustomSorter ? "":customSorter}`;
+        return `${version}ô${sorterType}ô${animateBuildings ? 1 : 0}${showSorterChanger ? 1 : 0}${showDirectionChanger ? 1 : 0}${showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${enabled}ô${customSorter === defaultCustomSorter ? "" : customSorter}`;
     },
     load: function(str){
-        console.log(str);
-        if(arr[0]) sorterType = parseInt(arr[0], 10) || 0;
-        if(arr[1]) {
-            let booleans = arr[1].split("");
-            if(booleans[0]) animateBuildings = parseInt(booleans[0], 10) === 1;
-            if(booleans[1]) showSorterChanger = parseInt(booleans[1], 10) === 1;
-            if(booleans[2]) showDirectionChanger = parseInt(booleans[2], 10) === 1;
-            if(booleans[3]) showOnlyCanAfford = parseInt(booleans[3], 10) === 1;
-            if(booleans[4]) this.DisableNotif = parseInt(booleans[4], 10) === 1;
-        }
-        if(arr[2]) {
-            let enabled = arr[2].split("");
-            for(let i =0;i<enabled.length;i++){
-                if(sortersOptions[i]){
-                    sortersOptions[i].enabled = (parseInt(enabled[i],10) === 1)
-                }
+        /** HOW MY CODE HAS SAVED STUFF. Now documented because it was a pain to track this down.
+            1.0
+             - save split by |
+             - sorterType, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford,
+            1.2
+             - save split by |
+             - sorterType, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford, disableNotif
+            1.3
+             - save split by |
+             - sorterType, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford, disableNotif, checkForUpdates, version
+            2.0
+             - save split by ô
+             - version, sorterType, BITFIELD-1, BITFIELD-2, customSorter
+                - BITFIELD-1 = animateBuildings, showSorterChanger, showDirectionChanger, showOnlyCanAfford, this.DisableNotif, this.CheckForUpdates
+                - BITFIELD-2 = Sorter_BuiltIn.enabled, Sorter_Amount.enabled, Sorter_Price.enabled, Sorter_CPS.enabled, Sorter_NextAchievement.enabled, Sorter_NextUpgrade.enabled, Sorter_Custom.enabled, Sorter_CookieMonsterPaybackPeriod.enabled, Sorter_FrozenCookiesEfficiency.enabled
+         */
+        let loadedVersion = ""
+        let arr = str.split("ô");
+        if(arr.length === 1){//Version 1.3 or below.
+            arr = str.split("|");
+            if(arr[0] && !isNaN(arr[0])){
+                sorterType = parseInt(arr[0], 10) || 0;
+                loadedVersion = "1.0";
+            }
+            if(arr[1] && !isNaN(arr[1])) animateBuildings = parseInt(arr[1], 10) === 1;
+            if(arr[2] && !isNaN(arr[2])) showSorterChanger = parseInt(arr[2], 10) === 1;
+            if(arr[3] && !isNaN(arr[3])) showDirectionChanger = parseInt(arr[3], 10) === 1;
+            if(arr[4] && !isNaN(arr[4])) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
+            if(arr[5] && !isNaN(arr[5])){
+                this.DisableNotif = parseInt(arr[5], 10);
+                loadedVersion = "1.2";
+            }
+            if(arr[6] && !isNaN(arr[6])) {
+                this.CheckForUpdates = parseInt(arr[6], 10);
+                loadedVersion = "1.3";
             }
         }
-        if(arr[3]){
-            customSorter = arr[3];
+        else{//Version 2 or higher
+            if(arr[0]) loadedVersion = arr[0];
+            if(arr[1]) sorterType = parseInt(arr[1], 10) || 0;
+            if(arr[2]){
+                let booleans = arr[2].split("");
+                if(booleans[0]) animateBuildings = parseInt(booleans[0], 10) === 1;
+                if(booleans[1]) showSorterChanger = parseInt(booleans[1], 10) === 1;
+                if(booleans[2]) showDirectionChanger = parseInt(booleans[2], 10) === 1;
+                if(booleans[3]) showOnlyCanAfford = parseInt(booleans[3], 10) === 1;
+                if(booleans[4]) this.DisableNotif = parseInt(booleans[4], 10) === 1 ? 1 : 0;
+                if(booleans[5]) this.CheckForUpdates = parseInt(booleans[5], 10) === 1 ? 1 : 0;
+            }
+            if(arr[3]){
+                let enabled = arr[3].split("");
+                for(let i = 0; i < enabled.length; i++){
+                    if(sortersOptions[i]){
+                        if(sortersOptions[i].sorterFrom === "CookieMonster") sortersOptions[i].enabledIfMyModIsEnabled = (parseInt(enabled[i], 10) === 1);
+                        if(sortersOptions[i].sorterFrom === "FrozenCookies") sortersOptions[i].enabledIfMyModIsEnabled = (parseInt(enabled[i], 10) === 1);
+                        else sortersOptions[i].enabled = (parseInt(enabled[i], 10) === 1);
+                    }
+                }
+            }
+            if(arr[4]){
+                customSorter = arr[4];
+            }
         }
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
@@ -864,7 +1065,23 @@ const BuildingSorter = {
         sort();
         if(this.DisableNotif === 0) Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully, check the settings for more info about how the mod sorts.<a style="float:right;" onclick="Game.mods.BuildingSorter.DisableNotif=1;==CLOSETHIS()==">Don't show this again</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         else Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], true);
-
+        if(this.CheckForUpdates === 1){
+            fetch("https://frustrated-programmer.github.io/BuildingSorter/version.txt").then(function(versionResponse){
+                versionResponse.json().then(function(versionJsonResult){
+                    if(loadedVersion.toLowerCase() !== `${versionJsonResult}`){
+                        let patchNoteFail = function(e){
+                            console.error(e);
+                            updateNoPatchNote(loadedVersion, versionJsonResult.toString());
+                        };
+                        fetch("https://frustrated-programmer.github.io/BuildingSorter/patchnotes.json").then(function(patchNotesResponse){
+                            patchNotesResponse.json().then(function(patchNoteJsonResponse){
+                                updateWithPatchNote(loadedVersion, `${versionJsonResult}`, patchNoteJsonResponse);
+                            }).catch(patchNoteFail);
+                        }).catch(patchNoteFail);
+                    }
+                }).catch(console.error);
+            }).catch(console.error);
+        }
     }
 };
 
@@ -873,5 +1090,38 @@ const readyCheck = setInterval(() => {
     if(typeof Game !== "undefined" && typeof Game.ready !== "undefined" && Game.ready){
         Game.registerMod("BuildingSorter", BuildingSorter);
         clearInterval(readyCheck);
+
+        //Check for external mods after 1s, 5s, 10s, 30s, 60s since mod was loaded.
+        let timers = [1000,4000,5000,20000,30000];
+        function checkForExternalMods(timerChecker){
+            if(!timers[timerChecker]) return;
+            setTimeout(function(){
+                //Check for CookieMonster
+                if(!CookieMonsterEnabled && !!(Game && Game.mods && Game.mods.CookieMonster && CookieMonsterData && CookieMonsterData.Objects1 && CookieMonsterData.Objects10 && CookieMonsterData.Objects100)){
+                    CookieMonsterEnabled = true;
+                    for(let i = 0; i < sortersOptions.length; i++){
+                        if(sortersOptions[i].sorterFrom === "CookieMonster") {
+                            sortersOptions[i].enabled = sortersOptions[i].enabledIfMyModIsEnabled;
+                            break;
+                        }
+                    }
+                }
+                //Check for FrozenCookies
+                if(!FrozenCookiesEnabled && !!(Game && Game.mods && Game.mods["Frozen Cookies mtarnuhal "] && FrozenCookies && FrozenCookies.caches && FrozenCookies.caches.buildings)){
+                    FrozenCookiesEnabled = true;
+                    for(let i = 0; i < sortersOptions.length; i++){
+                        if(sortersOptions[i].sorterFrom === "FrozenCookies") {
+                            sortersOptions[i].enabled = sortersOptions[i].enabledIfMyModIsEnabled;
+                            break;
+                        }
+                    }
+                }
+                //Check to see if we should check again.
+                if(!(FrozenCookiesEnabled && CookieMonsterEnabled)){
+                    checkForExternalMods(timerChecker+1);
+                }
+            },timers[timerChecker]);
+        }
+        checkForExternalMods(0);
     }
 }, 1000);

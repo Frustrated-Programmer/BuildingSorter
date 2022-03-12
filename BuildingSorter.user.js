@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      1.3
+// @version      2.0
 // @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
