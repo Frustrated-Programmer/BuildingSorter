@@ -932,11 +932,11 @@ function addSettings(){
 
 function updateNoPatchNote(oldVersion, newVersion){
     setTimeout(function(){//wait 30 secs before showing. To not overflow the notification bar.
-        if(version.toLowerCase() === newVersion.toLowerCase()){//Show what changed since last time
+        if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Show what changed since last time
             Game.Notify("Updated Building Sorter", `The mod 'Building Sorter' loaded from <span class="ModBuildingSorter_codeStyle">v${oldVersion}</span> to <span class="ModBuildingSorter_codeStyle">v${version}</span>. Patchnotes failed to load, but you can check them out <a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md">here</a>.`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         }
         else{
-            if(version.toLowerCase() === newVersion.toLowerCase()){//Advise the user to upgrade.
+            if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Advise the user to upgrade.
                 Game.Notify("Update Building Sorter", `The mod 'Building Sorter' is currently <span class="ModBuildingSorter_codeStyle">v${version}</span>, the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>. You can upgrade <a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter">here</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
             }
         }
@@ -944,21 +944,21 @@ function updateNoPatchNote(oldVersion, newVersion){
 }
 
 function updateWithPatchNote(oldVersion, newVersion, patchnotes){
-    let patchnote = patchnotes[newVersion];
+    let patchnote = patchnotes[`${newVersion}`];
     if(!patchnote){
         updateNoPatchNote(newVersion);
         return;
     }
     Game.mods.BuildingSorter.showPatchNotes = function(){
-        if(version.toLowerCase() === newVersion.toLowerCase()){//Show patchnotes
+        if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Show patchnotes
             Game.Prompt(`<h3>Updated Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md" id="ModBuildingSorter_HiddenPatchLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["See More", "l('ModBuildingSorter_HiddenPatchLinker').click()"]]);
         }
         else{//recommend user updates.
             Game.Prompt(`<h3>Update Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter" id="ModBuildingSorter_HiddenUpdateLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["Update", "l('ModBuildingSorter_HiddenUpdateLinker').click()"]]);
         }
     };
-    setTimeout(function(){//wait 30 secs before showing. To not overflow the notification bar.
-        if(version.toLowerCase() === newVersion.toLowerCase()){//Show patchnotes
+    setTimeout(function(){//wait 10 secs before showing. To not overflow the notification bar.
+        if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Show patchnotes
             Game.Notify("Updated Building Sorter", `The mod 'Building Sorter' updated from <span class="ModBuildingSorter_codeStyle">v${oldVersion}</span> the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>.<a style="float:right;" onclick="Game.mods.BuildingSorter.showPatchNotes();==CLOSETHIS()==">Whats new?</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         }
         else{//recommend user updates.
@@ -1067,15 +1067,16 @@ const BuildingSorter = {
         else Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], true);
         if(this.CheckForUpdates === 1){
             fetch("https://frustrated-programmer.github.io/BuildingSorter/version.txt").then(function(versionResponse){
-                versionResponse.json().then(function(versionJsonResult){
-                    if(loadedVersion.toLowerCase() !== `${versionJsonResult}`){
+                versionResponse.text().then(function(versionTextResult){
+                    versionTextResult = versionTextResult.toString().toLowerCase().trim();
+                    if(loadedVersion.toLowerCase() !== `${versionTextResult}`){
                         let patchNoteFail = function(e){
                             console.error(e);
-                            updateNoPatchNote(loadedVersion, versionJsonResult.toString());
+                            updateNoPatchNote(loadedVersion, versionTextResult.toString());
                         };
                         fetch("https://frustrated-programmer.github.io/BuildingSorter/patchnotes.json").then(function(patchNotesResponse){
                             patchNotesResponse.json().then(function(patchNoteJsonResponse){
-                                updateWithPatchNote(loadedVersion, `${versionJsonResult}`, patchNoteJsonResponse);
+                                updateWithPatchNote(loadedVersion, `${versionTextResult}`, patchNoteJsonResponse);
                             }).catch(patchNoteFail);
                         }).catch(patchNoteFail);
                     }
