@@ -6,10 +6,11 @@ This is a mod that sorts the buildings on the right hand side in several differe
  * <b>Next Achievement: </b>Calculates how many of each building you need to buy to unlock the next <i>achievement</i>, and ranks them from cheapest total cost of buying all said buildings
  * <b>Next Upgrade: </b>Calculates how many of each building you need to buy to unlock the next <i>upgrade</i>, and ranks them from cheapest total cost of buying all said buildings
  * <b>Custom Sorter: </b>For you to create your OWN sorter functionality. If you can come with any new sorting algorithms let me know, I might just add it into the official source code(crediting you of course)
- * <b>Cookie Monster's PP: </b>When using the mod CookieMonster, it has it's own sorting functionality that I had overrode. With this you can re-enable it and sort by the mod's PP.
+ * <b>CookieMonster's Payback Period: </b>When using the mod CookieMonster, it has it's own sorting functionality that I had overridden. With this you can re-enable it and sort by the mod's Payback Period.
+ * <b>FrozenCookie's Efficiency: </b>When using the mod FrozenCookies, it has it's recommendation of what buildings to buy in what order. I have now included a sorter to show the user this change.
 This information also is included in the Settings tab of CookieClicker with several options included as well.
 
-<img src="Options.png">
+<img src="Options.png" style="width:50%">
 
 ## To Install:
 
