@@ -1078,6 +1078,7 @@ const BuildingSorter = {
 };
 
 const readyCheck = setInterval(() => {
+    let unsafeWindow = unsafeWindow || {};
     const Game = unsafeWindow.Game || window.Game || Game;
     if(typeof Game !== "undefined" && typeof Game.ready !== "undefined" && Game.ready){
         Game.registerMod("BuildingSorter", BuildingSorter);
