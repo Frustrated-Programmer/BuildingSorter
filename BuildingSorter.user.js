@@ -8,10 +8,9 @@
 // ==/UserScript==
 
 const readyCheck = setInterval(() => {
-    let unsafeWindow = unsafeWindow || {};
-    const Game = unsafeWindow.Game || window.Game || Game;
-    if (typeof Game !== 'undefined' && typeof Game.ready !== 'undefined' && Game.ready) {
-        Game.LoadMod('https://frustrated-programmer.github.io/BuildingSorter/BuildingSorter.js');
+    const theGame = unsafeWindow.Game || Game || window.Game;
+    if (typeof theGame !== 'undefined' && typeof theGame.ready !== 'undefined' && theGame.ready) {
+        theGame.LoadMod('https://frustrated-programmer.github.io/BuildingSorter/BuildingSorter.js');
         clearInterval(readyCheck);
     }
 }, 1000);

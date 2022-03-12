@@ -1078,10 +1078,9 @@ const BuildingSorter = {
 };
 
 const readyCheck = setInterval(() => {
-    let unsafeWindow = unsafeWindow || {};
-    const Game = unsafeWindow.Game || window.Game || Game;
-    if(typeof Game !== "undefined" && typeof Game.ready !== "undefined" && Game.ready){
-        Game.registerMod("BuildingSorter", BuildingSorter);
+    const theGame = Game || window.Game;
+    if(typeof theGame !== "undefined" && typeof theGame.ready !== "undefined" && theGame.ready){
+        theGame.registerMod("BuildingSorter", BuildingSorter);
         clearInterval(readyCheck);
 
         //Check for external mods after 1s, 5s, 10s, 30s, 60s since mod was loaded.
@@ -1090,7 +1089,7 @@ const readyCheck = setInterval(() => {
             if(!timers[timerChecker]) return;
             setTimeout(function(){
                 //Check for CookieMonster
-                if(!CookieMonsterEnabled && !!(Game && Game.mods && Game.mods.CookieMonster && CookieMonsterData && CookieMonsterData.Objects1 && CookieMonsterData.Objects10 && CookieMonsterData.Objects100)){
+                if(!CookieMonsterEnabled && !!(theGame && theGame.mods && theGame.mods.CookieMonster && CookieMonsterData && CookieMonsterData.Objects1 && CookieMonsterData.Objects10 && CookieMonsterData.Objects100)){
                     CookieMonsterEnabled = true;
                     for(let i = 0; i < sortersOptions.length; i++){
                         if(sortersOptions[i].sorterFrom === "CookieMonster") {
@@ -1100,7 +1099,7 @@ const readyCheck = setInterval(() => {
                     }
                 }
                 //Check for FrozenCookies
-                if(!FrozenCookiesEnabled && !!(Game && Game.mods && Game.mods["Frozen Cookies mtarnuhal "] && FrozenCookies && FrozenCookies.caches && FrozenCookies.caches.buildings)){
+                if(!FrozenCookiesEnabled && !!(theGame && theGame.mods && theGame.mods["Frozen Cookies mtarnuhal "] && FrozenCookies && FrozenCookies.caches && FrozenCookies.caches.buildings)){
                     FrozenCookiesEnabled = true;
                     for(let i = 0; i < sortersOptions.length; i++){
                         if(sortersOptions[i].sorterFrom === "FrozenCookies") {
