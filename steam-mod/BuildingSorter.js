@@ -431,7 +431,7 @@ function affordableButtonTooltip(){
     return `<div style="padding:8px 4px;min-width:350px;">
             <div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:-${17 * 48}px -${6 * 48}px;"></div>
             <div class="name">Affordable Only</div>
-            <div class="tag" style="color:#fff;">[${showOnlyCanAfford ? "Enabled" : "Disabled"}]</div>
+            <div class="tag" style="color:#fff;">[${onlyCanAfford ? "Enabled" : "Disabled"}]</div>
             <div class="line"></div>
             <div class="description">Sorts only buildings you can afford, putting buildings you can't afford later towards the end of the list.</div>
         </div>
