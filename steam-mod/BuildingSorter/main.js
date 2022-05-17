@@ -14,7 +14,6 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  **/
-
 //This is a just passion project of mine. These are my ideas for how to improve. But without some donations or incredible recognition(I got 250 upvotes when I released my mod, that inspired me to release v2), I probably won't implement these. Feel free to make a PR I'll probably accept it.
 //TODO:
 // allow users to make MORE than 1 custom sorter.
@@ -25,9 +24,10 @@
 // allow dragging/dropping sorting option.
 // implement adjustments to some sorters depending on whether the user is "selling" or "buying" (currently everything assumes you are buying)
 // update next achievement and next upgrade, to exclude achievements/upgrades you already own. (Prestige or Selling can reproduce)
+// do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.0";
+const version = "2.1";
 const uniqueCharacter = "ô"
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==SAVED SETTINGS==
@@ -42,6 +42,7 @@ let customSorter = defaultCustomSorter;
 let forwardDirection = true;
 let onlyCanAfford = false;
 // ==OTHER==
+let startTime = Infinity;
 let CookieMonsterEnabled = false;
 let FrozenCookiesEnabled = false;
 let sorterElement = null;
@@ -115,7 +116,7 @@ let sortersOptions = [
             quote: "So YOU are my most valuable possession."
         },
         sort: function(array){
-            array.sort((a, b) => a.storedTotalCps - b.storedTotalCps);
+            array.sort((a, b) => b.storedTotalCps - a.storedTotalCps);
             return array;
         }
     },
@@ -207,27 +208,41 @@ let sortersOptions = [
         },
         sort: function(array){
             let toPassIn = Array.from(array);
-            let customSorterFunction = new Function(customSorter)();
-            let returnedArray = customSorterFunction(toPassIn);
             let toReturnBack = toPassIn;
-            if(returnedArray instanceof Array){
-                toReturnBack = returnedArray;
-            }
+            let ranSuccesfully = true;
+            try{
+                let customSorterFunction= new Function(customSorter)();
+                let returnedArray = customSorterFunction(toPassIn);
 
-            //Insert back any objects that might have been skipped.
-            //No we cannot hide any Objects, the best you can do is make their display="none" and then set them at the bottom of the list.
-            let ids = [];
-            for(let i = 0; i < toReturnBack.length; i++){
-                if(toReturnBack[i] && typeof toReturnBack[i] === "object" && typeof toReturnBack[i].id != "undefined"){
-                    ids.push(toReturnBack[i].id);
+                if(returnedArray instanceof Array){
+                    toReturnBack = returnedArray;
+                }
+
+                //Insert back any objects that might have been skipped.
+                //No we cannot hide any Objects, the best you can do is make their display="none" and then set them at the bottom of the list.
+                let ids = [];
+                for(let i = 0; i < toReturnBack.length; i++){
+                    if(toReturnBack[i] && typeof toReturnBack[i] === "object" && typeof toReturnBack[i].id != "undefined"){
+                        ids.push(toReturnBack[i].id);
+                    }
+                }
+                for(let i = 0; i < array.length; i++){
+                    if(!ids.includes(array[i].id)){
+                        toReturnBack.push(array[i]);
+                    }
                 }
             }
-            for(let i = 0; i < array.length; i++){
-                if(!ids.includes(array[i].id)){
-                    toReturnBack.push(array[i]);
+            catch(e){
+                incrementSorterType();
+                if(Date.now() - startTime < 60000 * 2){//if error occurs within the first 2 minutes of being loaded.
+                    Game.Prompt(`<h3 style="color:red">CustomSorter Error Occured</h3><div class="block">${cleanError(e)}</div><br><br><p style="text-align: justify-all">I've noticed, that only <span class="ModBuildingSorter_codeStyle">${Math.floor((Date.now() - startTime)/1000)} seconds</span> has passed.<br>Don't worry, your CustomSorter <b><em>probably</em></b> depends on another mod that hasn't fully loaded yet. Double check the mod has been initialized before using CustomSorter again.</p>`, [["Understood.", "Game.ClosePrompt();"]]);
+                }
+                else{
+                    Game.Prompt(`<h3 style="color:red">CustomSorter Error Occured</h3><div class="block">${cleanError(e)}</div>`, [["Understood.", "Game.ClosePrompt();"]]);
                 }
             }
-            return toReturnBack;
+            if(ranSuccesfully) return toReturnBack;
+            else return toPassIn;
         }
     },
     {
@@ -270,8 +285,20 @@ let sortersOptions = [
         },
         sort: function(array){
             if(!FrozenCookiesEnabled) return array;
-            array.sort((a, b) => {
-                if(FrozenCookies.caches.buildings[a.id] && FrozenCookies.caches.buildings[b.id]) return FrozenCookies.caches.buildings[a.id].efficiency - FrozenCookies.caches.buildings[b.id].efficiency;
+            //recommendationList() includes upgrades. Sort them out.
+            let recommends = recommendationList();
+            let recommendationBuildings = [];
+            for(let i =0;i<recommends.length;i++){
+                if(recommends[i].type === "building"){
+                    recommendationBuildings.push(recommends[i].purchase);
+                    if(recommendationBuildings.length === array.length) break;
+                }
+            }
+            //[recommendationBuildings] is a list of JUST buildings, recommended in order by FrozenCookies
+            array = recommendationBuildings;
+            array.sort((a,b)=>{
+                if(a.amount >= 500) return 1;
+                else if(b.amount >= 500) return -1;
                 else return 0;
             })
             return array;
@@ -403,7 +430,10 @@ style.id = "ModBuildingSorter_CSS";
 style.type = "text/css";
 style.innerHTML = CSSFILE;
 head.appendChild(style);
-
+function cleanError(text){
+    if(typeof (text) === `string`) return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
+    else return text;
+}
 function incrementSorterType(){
     sorterType++;
     if(sorterType === sortersOptions.length) sorterType = 0;
@@ -1081,6 +1111,7 @@ const BuildingSorter = {
 const readyCheck = setInterval(() => {
     const theGame = Game || window.Game;
     if(typeof theGame !== "undefined" && typeof theGame.ready !== "undefined" && theGame.ready){
+        startTime = Date.now();
         theGame.registerMod("BuildingSorter", BuildingSorter);
         clearInterval(readyCheck);
 
@@ -1100,7 +1131,11 @@ const readyCheck = setInterval(() => {
                     }
                 }
                 //Check for FrozenCookies
-                if(!FrozenCookiesEnabled && !!(theGame && theGame.mods && theGame.mods["Frozen Cookies mtarnuhal "] && FrozenCookies && FrozenCookies.caches && FrozenCookies.caches.buildings)){
+                /** currently supporting these: as of 5/16/2022
+                 * https://github.com/Icehawk78/FrozenCookies/
+                 * https://github.com/Mtarnuhal/FrozenCookies/
+                 */
+                if(!FrozenCookiesEnabled && !!(theGame && theGame.mods && (theGame.mods.frozen_cookies || theGame.mods["Frozen Cookies mtarnuhal "]) && FrozenCookies && typeof recommendationList === "function")){
                     FrozenCookiesEnabled = true;
                     for(let i = 0; i < sortersOptions.length; i++){
                         if(sortersOptions[i].sorterFrom === "FrozenCookies") {

@@ -23,5 +23,11 @@
 		"title": "Extra Sorting",
 		"message": "NEW SORTER: Custom Sorters now exist. (Careful)\nNEW SORTER: CookieMonster's Payback Period sorter.(Requires CookieMonster to be installed)\nNEW SORTER: FrozenCookie's Efficiency sorter.(Requires FrozenCookies to be installed)\nCan now enable/disable each sorter\nRevamped saving/loading to be more viable in future\nUpdated Patchnotes checker for those pesky side-cases.\nFixed disabling the mod temporarily.\nFixed the settings being bumpy when using CookieMonster.\nPut most of the stylization of all BuildingSorter's elements in a <style> tag.",
 		"html": "<ul style='list-style-type: disc; text-align: left;'><li>NEW SORTER: Custom Sorters now exist. (Careful)</li><li>NEW SORTER: CookieMonster's Payback Period sorter.(Requires CookieMonster to be installed)</li><li>NEW SORTER: FrozenCookie's Efficiency sorter.(Requires FrozenCookies to be installed)</li><li>Can now enable/disable each sorter</li><li>Revamped saving/loading to be more viable in future</li><li>Updated Patchnotes checker for those pesky side-cases.</li><li>Fixed disabling the mod temporarily.</li><li>Fixed the settings being bumpy when using CookieMonster.</li><li>Put most of the stylization of all BuildingSorter's elements in a &lt;style> tag.</li></ul>"
+	},
+	"2.1": {
+		"title": "Tweaks",
+		"message": "Fixed CustomSorters crashing on game load\nFixed CPS sorter being backwards\nImproved FrozenCookie's Efficiency sorter to use FrozenCookie built in sorter.\nIncluded support FrozenCookie by Icehawk78\nUpdated Steam mod to be more user-friendly.",
+		"html": "<ul><li>Fixed CustomSorters crashing on game load</li><li>Fixed CPS sorter being backwards</li><li>Improved FrozenCookie's Efficiency sorter to use FrozenCookie built in sorter.</li><li>Included support FrozenCookie by Icehawk78</li><li>Updated Steam mod to be more user-friendly.</li></ul>"
+		
 	}
 }

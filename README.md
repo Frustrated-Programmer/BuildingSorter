@@ -44,3 +44,25 @@ I don't OWN the Steam version, so I've just worked with the documentation. This 
 ## Credits:
 Huge thanks to [CookieMonster](https://github.com/CookieMonsterTeam/CookieMonster), I learned a ton from their code, and I also borrowed a ton of their README.
  
+# Todo
+This is a just passion project of mine. These are my ideas for how to improve. But without some donations or incredible recognition(I got 250 upvotes when I released my mod, that inspired me to release v2), I probably won't implement these. Feel free to make a PR I'll probably accept it.
+
+ * Allow users to make MORE than 1 custom sorter.
+ * Overhaul custom sorters:
+   - Look into finding other ways to save their custom functions so my mod doesn't have a massive save file
+   - Allow users to put a name & description for their custom sorters.
+   - Allow users to export/import custom sorters
+   - Allow users to put a name & description for their custom sorters.
+   - Allow users to pick an icon for their custom sorters and a quote
+ * Implement color coding for the custom coder (so it's more like an IDE)
+ * Allow dragging/dropping (aka manual) sorting option.
+ * Implement adjustments to some sorters depending on whether the user is "selling" or "buying" (currently everything assumes you are buying)
+ * Update next achievement and next upgrade, to exclude achievements/upgrades you already own. (Prestige or Selling can reproduce)
+ * Turn the patchnotes reader into a more sleek design.
+    - Allow reading past patchnotes IN the mod.
+ * Building Sorter's Settings look terrible. Remake it to be more sleek.
+    - Turn checkboxes into more Cookie Clicker theme.
+    - Put icon with tooltip behind each sorter so the description isn't normally shown
+    - Allow animation speed to be an option.
+    - Rename "Allow check for updates" to be "Updates: ON/OFF"
+   
