@@ -5,8 +5,8 @@
 	"Description": "Sorts the building list on the right in multiple different ways.",
 	"ModVersion": 2.1,
 	"GameVersion": 2.043,
-	"Date": "3/11/2022",
+	"Date": "5/17/2022",
 	"Dependencies": [],
-	"Disabled": 0
+	"Disabled": 1,
     "AllowSteamAchievs": 1
 }
