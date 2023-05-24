@@ -16,6 +16,7 @@
  **/
 //This is a just passion project of mine. These are my ideas for how to improve. But without some donations or incredible recognition(I got 250 upvotes when I released my mod, that inspired me to release v2), I probably won't implement these. Feel free to make a PR I'll probably accept it.
 //TODO:
+// put everything under a single class, so other mods have access to adding/removing sorters
 // allow users to make MORE than 1 custom sorter.
 //  - look into finding other ways to save their custom functions so my mod doesn't have a massive save file
 //  - allow users to put a name & description for their custom sorters.
@@ -27,16 +28,11 @@
 // do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.2";
-const uniqueCharacter = "ô"
+const version = "2.3";
+const uniqueCharacter = "ô";
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==SAVED SETTINGS==
 let sorterType = 0;
-let animateBuildings = true;
-let disabled = false;
-let showSorterChanger = true;
-let showDirectionChanger = true;
-let showOnlyCanAfford = true;
 let customSorter = defaultCustomSorter;
 // ==USER CHANGEABLE== (but not saved)
 let forwardDirection = true;
@@ -434,6 +430,7 @@ function cleanError(text){
     if(typeof (text) === `string`) return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
     else return text;
 }
+
 function incrementSorterType(){
     sorterType++;
     if(sorterType === sortersOptions.length) sorterType = 0;
@@ -497,8 +494,8 @@ function createUpgradeTiers(){
 }
 
 function updateBuildingAnimations(){
-    let timer = animateBuildings ? "0.5s" : "0ms";
-    if(disabled) timer = "0ms";
+    let timer = BuildingSorter.settings.animateBuildings ? "0.5s" : "0ms";
+    if(BuildingSorter.settings.disabledMod) timer = "0ms";
     for(let i = 0; i < ObjectsToSort.length; i++){
         ObjectsToSort[i].l.style["-webkit-transition"] = `all ${timer} ease`;
         ObjectsToSort[i].l.style["-moz-transition"] = `all ${timer} ease`;
@@ -512,7 +509,7 @@ function updateBuildingAnimations(){
 }
 
 function sort(){
-    if(disabled){
+    if(BuildingSorter.settings.disabledMod){
         ObjectsToSort = Object.values(Game.Objects);
         for(let i = 0; i < ObjectsToSort.length; i++){
             ObjectsToSort[i].l.style.top = "0px";
@@ -550,7 +547,7 @@ function sort(){
         }
     }
     let skips = 0;
-    if(!disabled) products.style.display = "block";
+    if(!BuildingSorter.settings.disabledMod) products.style.display = "block";
     for(let i = 0; i < ObjectsToSort.length; i++){
         let obj = ObjectsToSort[i].l;
         if(obj.classList.contains("toggledOff")){
@@ -567,10 +564,10 @@ function updateSorterButtons(){
     changeables.children[0].innerText = sortersOptions[sorterType].text;
     changeables.children[1].innerText = forwardDirection ? "▲" : "▼";
     changeables.children[2].style.color = onlyCanAfford ? "#59FF00" : "#FF0000";
-    changeables.children[0].style.display = showSorterChanger ? "block" : "none";
-    changeables.children[1].style.display = showDirectionChanger ? "block" : "none";
-    changeables.children[2].style.display = showOnlyCanAfford ? "block" : "none";
-    sorterElement.style.display = (!showSorterChanger && !showDirectionChanger && !showOnlyCanAfford) ? "none" : "block";
+    changeables.children[0].style.display = BuildingSorter.settings.showSorterChanger ? "block" : "none";
+    changeables.children[1].style.display = BuildingSorter.settings.showDirectionChanger ? "block" : "none";
+    changeables.children[2].style.display = BuildingSorter.settings.showOnlyCanAfford ? "block" : "none";
+    sorterElement.style.display = (!BuildingSorter.settings.showSorterChanger && !BuildingSorter.settings.showDirectionChanger && !BuildingSorter.settings.showOnlyCanAfford) ? "none" : "block";
 }
 
 function addSorter(){
@@ -905,37 +902,40 @@ function addSettings(){
         };
     }
     settings.appendChild(description);
-    createSettingsButton(showSorterChanger ? "Showing Sorter" : "Hiding Sorter", "Whether to show/hide the sorter option on the sidebar for quick adjustments.", buttonsHolder, function(){
-        showSorterChanger = !showSorterChanger;
-        this.innerText = showSorterChanger ? "Showing Sorter" : "Hiding Sorter";
+    createSettingsButton(BuildingSorter.settings.showSorterChanger ? "Showing Sorter" : "Hiding Sorter", "Whether to show/hide the sorter option on the sidebar for quick adjustments.", buttonsHolder, function(){
+        BuildingSorter.settings.showSorterChanger = !BuildingSorter.settings.showSorterChanger;
+        this.innerText = BuildingSorter.settings.showSorterChanger ? "Showing Sorter" : "Hiding Sorter";
         updateSorterButtons();
     });
-    createSettingsButton(showDirectionChanger ? "Showing Directional" : "Hiding Directional", "Whether to show/hide the directional option on the sidebar for quick adjustments.", buttonsHolder, function(){
-        showDirectionChanger = !showDirectionChanger;
-        this.innerText = showDirectionChanger ? "Showing Directional" : "Hiding Directional";
+    createSettingsButton(BuildingSorter.settings.showDirectionChanger ? "Showing Directional" : "Hiding Directional", "Whether to show/hide the directional option on the sidebar for quick adjustments.", buttonsHolder, function(){
+        BuildingSorter.settings.showDirectionChanger = !BuildingSorter.settings.showDirectionChanger;
+        this.innerText = BuildingSorter.settings.showDirectionChanger ? "Showing Directional" : "Hiding Directional";
         updateSorterButtons();
     });
-    createSettingsButton(showOnlyCanAfford ? "Showing Affordable" : "Hiding Affordable", "Whether to show/hide the affordable option on the sidebar for quick adjustments.", buttonsHolder, function(){
-        showOnlyCanAfford = !showOnlyCanAfford;
-        this.innerText = showOnlyCanAfford ? "Showing Affordable" : "Hiding Affordable";
+    createSettingsButton(BuildingSorter.settings.showOnlyCanAfford ? "Showing Affordable" : "Hiding Affordable", "Whether to show/hide the affordable option on the sidebar for quick adjustments.", buttonsHolder, function(){
+        BuildingSorter.settings.showOnlyCanAfford = !BuildingSorter.settings.showOnlyCanAfford;
+        this.innerText = BuildingSorter.settings.showOnlyCanAfford ? "Showing Affordable" : "Hiding Affordable";
         updateSorterButtons();
     });
-    createSettingsButton(animateBuildings ? "Animating Buildings" : "Instant Buildings", "Whether the buildings smoothly move when sorting options change or update.", buttonsHolder, function(){
-        animateBuildings = !animateBuildings;
-        this.innerText = animateBuildings ? "Animating Buildings" : "Instant Buildings";
+    createSettingsButton(BuildingSorter.settings.animateBuildings ? "Animating Buildings" : "Instant Buildings", "Whether the buildings smoothly move when sorting options change or update.", buttonsHolder, function(){
+        BuildingSorter.settings.animateBuildings = !BuildingSorter.settings.animateBuildings;
+        this.innerText = BuildingSorter.settings.animateBuildings ? "Animating Buildings" : "Instant Buildings";
         updateBuildingAnimations();
     });
-    createSettingsButton(disabled ? "Mod Disabled" : "Mod Enabled", "Temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
-        disabled = !disabled;
-        this.innerText = disabled ? "Mod Disabled" : "Mod Enabled";
+    createSettingsButton(BuildingSorter.settings.disabledMod ? "Mod Disabled" : "Mod Enabled", "Temporarily disable the mod, this allows other mods to sort the list instead. Example: Cookie Monster", buttonsHolder, function(){
+        BuildingSorter.settings.disabledMod = !BuildingSorter.settings.disabledMod;
+        this.innerText = BuildingSorter.settings.disabledMod ? "Mod Disabled" : "Mod Enabled";
         products.style.display = "grid";//CookieMonster requires this. I'd rather not break a well known mod. But shame it doesn't update this itself.
-        sorterElement.style.display = disabled ? "none" : "flex";
+        sorterElement.style.display = BuildingSorter.settings.disabledMod ? "none" : "flex";
         updateBuildingAnimations();
         sort();
     });
-    createSettingsButton(BuildingSorter.CheckForUpdates ? "Allow check for updates" : "Stay offline", "Whether to check if the mod has some updates or not.", buttonsHolder, function(){
+    createSettingsButton(BuildingSorter.CheckForUpdates ? "Allowing checks for updates" : "Staying offline", "Whether to check if the mod has updates or not.", buttonsHolder, function(){
         BuildingSorter.CheckForUpdates = !BuildingSorter.CheckForUpdates;
-        this.innerText = BuildingSorter.CheckForUpdates ? "Check for updates" : "Stay offline";
+        this.innerText = BuildingSorter.CheckForUpdates ? "Allowing checks for updates" : "Staying offline";
+        if(BuildingSorter.CheckForUpdates){
+            BuildingSorter.checkForUpdate();
+        }
     });
     settings.append(buttonsHolder);
     /**ADD SETTINGS**/
@@ -955,11 +955,11 @@ function addSettings(){
 function updateNoPatchNote(oldVersion, newVersion){
     setTimeout(function(){//wait 30 secs before showing. To not overflow the notification bar.
         if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Show what changed since last time
-            Game.Notify("Updated Building Sorter", `The mod 'Building Sorter' loaded from <span class="ModBuildingSorter_codeStyle">v${oldVersion}</span> to <span class="ModBuildingSorter_codeStyle">v${version}</span>. Patchnotes failed to load, but you can check them out <a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md">here</a>.`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+            Game.Notify("Updated Building Sorter", `The mod 'Building Sorter' loaded from <span class="ModBuildingSorter_codeStyle">v${oldVersion}</span> to <span class="ModBuildingSorter_codeStyle">v${version}</span>. Patchnotes failed to load, but you can check them out <a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md">here</a>.`, [0.25, 0.25, "https://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         }
         else{
             if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Advise the user to upgrade.
-                Game.Notify("Update Building Sorter", `The mod 'Building Sorter' is currently <span class="ModBuildingSorter_codeStyle">v${version}</span>, the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>. You can upgrade <a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter">here</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
+                Game.Notify("Update Building Sorter", `The mod 'Building Sorter' is currently <span class="ModBuildingSorter_codeStyle">v${version}</span>, the newest version is <span class="ModBuildingSorter_codeStyle">v${newVersion}</span>. You can upgrade <a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter">here</a>`, [0.25, 0.25, "https://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
             }
         }
     }, 10000);
@@ -973,7 +973,7 @@ function updateWithPatchNote(oldVersion, newVersion, patchnotes){
     }
     Game.mods.BuildingSorter.showPatchNotes = function(){
         if(`${version}`.toLowerCase() === `${newVersion}`.toLowerCase()){//Show patchnotes
-            Game.Prompt(`<h3>Updated Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md" id="ModBuildingSorter_HiddenPatchLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["See More", "l('ModBuildingSorter_HiddenPatchLinker').click()"]]);
+            Game.Prompt(`<h3>Updated Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://frustrated-programmer.github.io/BuildingSorter/patchnotes.md" id="ModBuildingSorter_HiddenPatchLinker"></a>`, [["Okay!", "Game.ClosePrompt();"], ["See More", "l('ModBuildingSorter_HiddenPatchLinker').click()"]]);
         }
         else{//recommend user updates.
             Game.Prompt(`<h3>Update Version ${newVersion}</h3><div class="block">${patchnote.html}</div><a target="_blank" href="https://github.com/Frustrated-Programmer/BuildingSorter" id="ModBuildingSorter_HiddenUpdateLinker"></a>`, [["Ignore for now.", "Game.ClosePrompt();"], ["Update", "l('ModBuildingSorter_HiddenUpdateLinker').click()"]]);
@@ -989,12 +989,26 @@ function updateWithPatchNote(oldVersion, newVersion, patchnotes){
     }, 10000);
 }
 
+
 const BuildingSorter = {
+    loadedVersion:version,
+    version:version,
     CheckForUpdates: 1,
     DisableNotif: 0,
     showPatchNotes: null,
     prompt: null,
+    sorters:[],
+    settings:{
+        showSorterChanger:true,
+        showDirectionChanger:true,
+        showOnlyCanAfford:true,
+        animateBuildings:true,
+        disabledMod: false,
+        CheckForUpdates:true,
+    },
+
     init: function(){
+        console.log("init")
         Game.registerHook("logic", function(value){
             addSettings();
             sort();
@@ -1009,13 +1023,16 @@ const BuildingSorter = {
     },
 
     save: function(){
+        console.log("save");
         let enabled = ``;
         for(let i = 0; i < sortersOptions.length; i++){
             enabled += (sortersOptions[i].enabled || sortersOptions[i].enabledIfMyModIsEnabled) ? `1` : `0`;
         }
-        return `${version}ô${sorterType}ô${animateBuildings ? 1 : 0}${showSorterChanger ? 1 : 0}${showDirectionChanger ? 1 : 0}${showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${enabled}ô${customSorter === defaultCustomSorter ? "" : customSorter}`;
+        return `${version}ô${sorterType}ô${BuildingSorter.settings.animateBuildings ? 1 : 0}${BuildingSorter.settings.showSorterChanger ? 1 : 0}${BuildingSorter.settings.showDirectionChanger ? 1 : 0}${BuildingSorter.settings.showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${enabled}ô${customSorter === defaultCustomSorter ? "" : customSorter}`;
     },
+
     load: function(str){
+        console.log("load")
         /** HOW MY CODE HAS SAVED STUFF. Now documented because it was a pain to track this down.
          1.0
          - save split by |
@@ -1040,10 +1057,10 @@ const BuildingSorter = {
                 sorterType = parseInt(arr[0], 10) || 0;
                 loadedVersion = "1.0";
             }
-            if(arr[1] && !isNaN(arr[1])) animateBuildings = parseInt(arr[1], 10) === 1;
-            if(arr[2] && !isNaN(arr[2])) showSorterChanger = parseInt(arr[2], 10) === 1;
-            if(arr[3] && !isNaN(arr[3])) showDirectionChanger = parseInt(arr[3], 10) === 1;
-            if(arr[4] && !isNaN(arr[4])) showOnlyCanAfford = parseInt(arr[4], 10) === 1;
+            if(arr[1] && !isNaN(arr[1])) this.settings.animateBuildings = parseInt(arr[1], 10) === 1;
+            if(arr[2] && !isNaN(arr[2])) this.settings.showSorterChanger = parseInt(arr[2], 10) === 1;
+            if(arr[3] && !isNaN(arr[3])) this.settings.showDirectionChanger = parseInt(arr[3], 10) === 1;
+            if(arr[4] && !isNaN(arr[4])) this.settings.showOnlyCanAfford = parseInt(arr[4], 10) === 1;
             if(arr[5] && !isNaN(arr[5])){
                 this.DisableNotif = parseInt(arr[5], 10);
                 loadedVersion = "1.2";
@@ -1058,10 +1075,10 @@ const BuildingSorter = {
             if(arr[1]) sorterType = parseInt(arr[1], 10) || 0;
             if(arr[2]){
                 let booleans = arr[2].split("");
-                if(booleans[0]) animateBuildings = parseInt(booleans[0], 10) === 1;
-                if(booleans[1]) showSorterChanger = parseInt(booleans[1], 10) === 1;
-                if(booleans[2]) showDirectionChanger = parseInt(booleans[2], 10) === 1;
-                if(booleans[3]) showOnlyCanAfford = parseInt(booleans[3], 10) === 1;
+                if(booleans[0]) this.settings.animateBuildings = parseInt(booleans[0], 10) === 1;
+                if(booleans[1]) this.settings.showSorterChanger = parseInt(booleans[1], 10) === 1;
+                if(booleans[2]) this.settings.showDirectionChanger = parseInt(booleans[2], 10) === 1;
+                if(booleans[3]) this.settings.showOnlyCanAfford = parseInt(booleans[3], 10) === 1;
                 if(booleans[4]) this.DisableNotif = parseInt(booleans[4], 10) === 1 ? 1 : 0;
                 if(booleans[5]) this.CheckForUpdates = parseInt(booleans[5], 10) === 1 ? 1 : 0;
             }
@@ -1079,6 +1096,7 @@ const BuildingSorter = {
                 customSorter = arr[4];
             }
         }
+        this.loadedVersion = `${loadedVersion}`;
         if(sorterType < 0) sorterType = 0;
         if(sorterType >= sortersOptions.length) sorterType = 0;
         if(isNaN(sorterType)) sorterType = 0;
@@ -1088,23 +1106,27 @@ const BuildingSorter = {
         if(this.DisableNotif === 0) Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully, check the settings for more info about how the mod sorts.<a style="float:right;" onclick="Game.mods.BuildingSorter.DisableNotif=1;==CLOSETHIS()==">Don't show this again</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         else Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], true);
         if(this.CheckForUpdates === 1){
-            fetch("https://frustrated-programmer.github.io/BuildingSorter/version.txt").then(function(versionResponse){
-                versionResponse.text().then(function(versionTextResult){
-                    versionTextResult = versionTextResult.toString().toLowerCase().trim();
-                    if(loadedVersion.toLowerCase() !== `${versionTextResult}`){
-                        let patchNoteFail = function(e){
-                            console.error(e);
-                            updateNoPatchNote(loadedVersion, versionTextResult.toString());
-                        };
-                        fetch("https://frustrated-programmer.github.io/BuildingSorter/patchnotes.json").then(function(patchNotesResponse){
-                            patchNotesResponse.json().then(function(patchNoteJsonResponse){
-                                updateWithPatchNote(loadedVersion, `${versionTextResult}`, patchNoteJsonResponse);
-                            }).catch(patchNoteFail);
-                        }).catch(patchNoteFail);
-                    }
-                }).catch(console.error);
-            }).catch(console.error);
+            this.checkForUpdate();
         }
+    },
+
+    checkForUpdate: function(){
+        fetch("https://frustrated-programmer.github.io/BuildingSorter/version.txt").then((versionResponse) => {
+            versionResponse.text().then((versionTextResult) => {
+                versionTextResult = versionTextResult.toString().toLowerCase().trim();
+                if(this.loadedVersion.toLowerCase() !== `${versionTextResult}`){
+                    let patchNoteFail = (e) => {
+                        console.error(e);
+                        updateNoPatchNote(this.loadedVersion, versionTextResult.toString());
+                    };
+                    fetch("https://frustrated-programmer.github.io/BuildingSorter/patchnotes.json").then((patchNotesResponse) => {
+                        patchNotesResponse.json().then((patchNoteJsonResponse) => {
+                            updateWithPatchNote(this.loadedVersion, `${versionTextResult}`, patchNoteJsonResponse);
+                        }).catch(patchNoteFail);
+                    }).catch(patchNoteFail);
+                }
+            }).catch(console.error);
+        }).catch(console.error);
     }
 };
 

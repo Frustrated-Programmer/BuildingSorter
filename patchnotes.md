@@ -1,6 +1,9 @@
 #Patch-notes
-## 2.2 Minor QoL Change
-<ul><li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li></ul>
+## 2.3 Minor QoL Change
+<ul>
+    <li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li>
+    <li>Minor improvements to checks for updates, and saving settings.</li>
+</ul>
 
 
 ## 2.1 Minor Tweaks
