@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      2.1
+// @version      2.2
 // @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
@@ -35,7 +35,7 @@
 // do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.1";
+const version = "2.2";
 const uniqueCharacter = "ô"
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==SAVED SETTINGS==
@@ -256,7 +256,7 @@ let sortersOptions = [
     {
         enabled: false,
         sorterFrom:"CookieMonster",
-        enabledIfMyModIsEnabled: false,
+        enabledIfMyModIsEnabled: true,
         text: "Payback Period",
         description: "Sort the display of buildings by CookieMonster's Payback Period",
         tooltip: {
@@ -281,7 +281,7 @@ let sortersOptions = [
     {
         enabled: false,
         sorterFrom:"FrozenCookies",
-        enabledIfMyModIsEnabled: false,
+        enabledIfMyModIsEnabled: true,
         text: "Efficiency",
         description: "Sort the display of buildings by FrozenCookie's Efficiency recommendation.",
         tooltip: {

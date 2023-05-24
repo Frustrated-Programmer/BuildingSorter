@@ -27,8 +27,8 @@
 // do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.1";
-const uniqueCharacter = "ô"
+const version = "2.2";
+const uniqueCharacter = "ô";
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==SAVED SETTINGS==
 let sorterType = 0;
@@ -248,7 +248,7 @@ let sortersOptions = [
     {
         enabled: false,
         sorterFrom:"CookieMonster",
-        enabledIfMyModIsEnabled: false,
+        enabledIfMyModIsEnabled: true,
         text: "Payback Period",
         description: "Sort the display of buildings by CookieMonster's Payback Period",
         tooltip: {
@@ -273,7 +273,7 @@ let sortersOptions = [
     {
         enabled: false,
         sorterFrom:"FrozenCookies",
-        enabledIfMyModIsEnabled: false,
+        enabledIfMyModIsEnabled: true,
         text: "Efficiency",
         description: "Sort the display of buildings by FrozenCookie's Efficiency recommendation.",
         tooltip: {
@@ -445,7 +445,6 @@ function incrementSorterType(){
         sort();
     }
 }
-
 function directionButtonTooltip(){
     return `<div style="padding:8px 4px;min-width:350px;">
             <div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:-${11 * 48}px -${10 * 48}px;"></div>
@@ -456,7 +455,6 @@ function directionButtonTooltip(){
         </div>
         <div class="line"></div>`;
 }
-
 function affordableButtonTooltip(){
     return `<div style="padding:8px 4px;min-width:350px;">
             <div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:-${17 * 48}px -${6 * 48}px;"></div>
@@ -467,7 +465,6 @@ function affordableButtonTooltip(){
         </div>
         <div class="line"></div>`;
 }
-
 function createToolTip(){
     let tooltip = sortersOptions[sorterType].tooltip;
     return `
@@ -480,7 +477,6 @@ function createToolTip(){
         </div>
         <div class="line"></div>`;
 }
-
 function createUpgradeTiers(){
     let tiers = Object.values(Game.Tiers);
     for(let i = 0; i < tiers.length; i++){
@@ -495,7 +491,6 @@ function createUpgradeTiers(){
         }
     }
 }
-
 function updateBuildingAnimations(){
     let timer = animateBuildings ? "0.5s" : "0ms";
     if(disabled) timer = "0ms";
@@ -995,6 +990,7 @@ const BuildingSorter = {
     showPatchNotes: null,
     prompt: null,
     init: function(){
+        console.log("init")
         Game.registerHook("logic", function(value){
             addSettings();
             sort();
@@ -1009,6 +1005,7 @@ const BuildingSorter = {
     },
 
     save: function(){
+        console.log("save");
         let enabled = ``;
         for(let i = 0; i < sortersOptions.length; i++){
             enabled += (sortersOptions[i].enabled || sortersOptions[i].enabledIfMyModIsEnabled) ? `1` : `0`;
@@ -1016,6 +1013,7 @@ const BuildingSorter = {
         return `${version}ô${sorterType}ô${animateBuildings ? 1 : 0}${showSorterChanger ? 1 : 0}${showDirectionChanger ? 1 : 0}${showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${enabled}ô${customSorter === defaultCustomSorter ? "" : customSorter}`;
     },
     load: function(str){
+        console.log("load")
         /** HOW MY CODE HAS SAVED STUFF. Now documented because it was a pain to track this down.
          1.0
          - save split by |

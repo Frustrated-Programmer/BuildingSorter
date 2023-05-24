@@ -28,6 +28,10 @@
 		"title": "Tweaks",
 		"message": "Fixed CustomSorters crashing on game load\nFixed CPS sorter being backwards\nImproved FrozenCookie's Efficiency sorter to use FrozenCookie built in sorter.\nIncluded support FrozenCookie by Icehawk78\nUpdated Steam mod to be more user-friendly.",
 		"html": "<ul><li>Fixed CustomSorters crashing on game load</li><li>Fixed CPS sorter being backwards</li><li>Improved FrozenCookie's Efficiency sorter to use FrozenCookie built in sorter.</li><li>Included support FrozenCookie by Icehawk78</li><li>Updated Steam mod to be more user-friendly.</li></ul>"
-		
+	},
+	"2.2": {
+		"title": "Minor QoL Change",
+		"message": "FrozenCookies and CookieMonster sorters are now enabled by default.",
+		"html": "<ul><li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li></ul>"
 	}
 }

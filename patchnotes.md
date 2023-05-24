@@ -1,4 +1,8 @@
 #Patch-notes
+## 2.2 Minor QoL Change
+<ul><li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li></ul>
+
+
 ## 2.1 Minor Tweaks
 <ul>
     <li>Fixed CustomSorters crashing on game load</li>
@@ -7,6 +11,7 @@
     <li>Included support FrozenCookie by Icehawk78</li>
     <li>Updated Steam mod to be more user-friendly.</li>
 </ul>
+
 ## 2.0 Extra Sorting
 <ul>
     <li>NEW SORTER: Custom Sorters now exist. (Careful)</li>
