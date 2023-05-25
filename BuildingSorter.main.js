@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Building Sorter
 // @version      2.3
-// @description  Allows you to sort the buildings in several different ways.
+// @description  Allows you to runCurrentSorter the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAKlBMVEWOOT9GUDHDv5BbGyqUbD7EaVf///+MjF5fMyB2Si08Fg5IHxMgDgr////9CbZGAAAADnRSTlP/////////////////AEXA3MgAAAFUSURBVHja7Jdtr4MgDIWBeaWl9f//3VtelosboCtbcpd45IPG9AHPKUbNNilzAb4CwFlqAHtrvXeeJwFmAnC7GfMzATDvAbzqwZ/1bDQmVtbrUqis16VQWa9LobJel0JlvS6Fyvorhe9LgU+pD2DoaMFa/DnAxqEjBCosIh55QB0tCGV6wAMAc2MkAKXjEBC4Mf4J4H58zMRx91EV464bzYtN9NRM7wOc6UJodGMFoHZ9ZSA2jNwBGvZDBpA0AHlRPu0CnucvAJAeknK7+njaBzCHhwH3R5B659ZVCKgByMqlXhSXoAZYa50dA/oe5BVY55UriB64NQNUHhAlwir1pEpBsks5yvyg6oOzndhbwX4zkMYD2X9ZiDoPEOV5MgA0mykC4vvyANDfzhkQCSPA4IVaAEKYBFAYAEK7PiySm+RYbkO6agFOfl08fmNcP57b9ivAAE0ItTfDUzdYAAAAAElFTkSuQmCC
@@ -36,12 +36,9 @@
 // do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.3";
+const version = "2.4";
 const uniqueCharacter = "ô";
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
-// ==SAVED SETTINGS==
-let sorterType = 0;
-let customSorter = defaultCustomSorter;
 // ==USER CHANGEABLE== (but not saved)
 let forwardDirection = true;
 let onlyCanAfford = false;
@@ -55,260 +52,6 @@ let ObjectsToSort = [];
 let UpgradeTiers = {};
 let buildingAchievementTiers = [0, 1, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
 let products = null;
-let sortersOptions = [
-    {
-        enabled: true,
-        sorterFrom:"BuildingSorter",
-        text: "Built In",
-        description: "Sort's building's by their ID's number. This ranks them in order how they were designed to be displayed. This theoretically works with mods that adds new options so long as their ID is a number.",
-        tooltip: {
-            icon: [10, 0],
-            title: "Built In",
-            forwardDescription: "Orders the buildings based on their <b>built in</b> order.",
-            reverseDescription: "Orders the buildings based on their <b>built in</b> order but backwards.",
-            quote: "Classic Ortiel's List."
-        },
-        sort: function(array){
-            array.sort((a, b) => a.id - b.id);
-            return array;
-        }
-    },
-    {
-        enabled: true,
-        sorterFrom:"BuildingSorter",
-        text: "Amount",
-        description: "Sort's building's by showing the buildings that you own less of towards the top.",
-        tooltip: {
-            icon: [10, 33],
-            title: "Amount",
-            forwardDescription: "Places the buildings you own the <b>least</b> of at the top.",
-            reverseDescription: "Places the buildings you own the <b>most</b> of at the top.",
-            quote: "Ever heard of something called, a Monopoly?"
-        },
-        sort: function(array){
-            array.sort((a, b) => a.amount - b.amount);
-            return array;
-        }
-    },
-    {
-        enabled: true,
-        sorterFrom:"BuildingSorter",
-        text: "Price",
-        description: "Grabs each building's current price for buying only 1 of that building, then ranks them based on lowest price.",
-        tooltip: {
-            icon: [3, 5],
-            title: "Price",
-            forwardDescription: "Places the current cheapest building at the top.",
-            reverseDescription: "Places the current costliest building at the top.",
-            quote: "Where shall I spend this dough?"
-        },
-        sort: function(array){
-            array.sort((a, b) => a.bulkPrice - b.bulkPrice);
-            return array;
-        }
-    },
-    {
-        enabled: true,
-        sorterFrom:"BuildingSorter",
-        text: "CPS",
-        description: "Grabs how much each building is producing in CPS, and ranks them based on which is currently producing the most.",
-        tooltip: {
-            icon: [21, 6],
-            title: "CPS",
-            forwardDescription: "Places buildings generating the highest <b>C</b>ookies <b>P</b>er <b>S</b>econd at the top.",
-            reverseDescription: "Places buildings generating the lowest <b>C</b>ookies <b>P</b>er <b>S</b>econd at the top.",
-            quote: "So YOU are my most valuable possession."
-        },
-        sort: function(array){
-            array.sort((a, b) => b.storedTotalCps - a.storedTotalCps);
-            return array;
-        }
-    },
-    {
-        enabled: true,
-        sorterFrom:"BuildingSorter",
-        text: "Next Achievement",
-        description: "Calculates how many of each building you need to buy to unlock the next achievement, and ranks them from cheapest total cost of buying all said buildings",
-        tooltip: {
-            icon: [32, 33],
-            title: "Next Achievement",
-            forwardDescription: "Calculates how many buildings you need to buy to unlock the next achievement, and then places lowest total price at the top.",
-            reverseDescription: "Calculates how many buildings you need to buy to unlock the next achievement, and then places highest total price at the top.",
-            quote: "Achievement hunter. But it costs cookies."
-        },
-        sort: function(array){
-            array.sort((a, b) => {
-                let aTier = 0;
-                let bTier = 0;
-                let aRemainder = Infinity;
-                let bRemainder = Infinity;
-                for(let i = 0; i < buildingAchievementTiers.length; i++){
-                    if(a.amount >= buildingAchievementTiers[i]) aTier = i;
-                    if(b.amount >= buildingAchievementTiers[i]) bTier = i;
-                }
-                if(buildingAchievementTiers[aTier + 1]) aRemainder = buildingAchievementTiers[aTier + 1] - a.amount;
-                if(buildingAchievementTiers[bTier + 1]) bRemainder = buildingAchievementTiers[bTier + 1] - b.amount;
-                if(isFinite(aRemainder) && isFinite(bRemainder)){
-                    return a.getSumPrice(aRemainder) - b.getSumPrice(bRemainder);
-                }
-                else return a.id - b.id;
-            });
-            return array;
-        }
-    },
-    {
-        enabled: true,
-        sorterFrom:"BuildingSorter",
-        text: "Next Upgrade",
-        description: "Calculates how many of each building you need to buy to unlock the next upgrade, and ranks them from cheapest total cost of buying all said buildings",
-        tooltip: {
-            icon: [29, 7],
-            title: "Next Upgrade",
-            forwardDescription: "Calculates how many buildings you need to buy to unlock the next upgrade, and then places lowest total price at the top.",
-            reverseDescription: "Calculates how many buildings you need to buy to unlock the next upgrade, and then places highest total price at the top.",
-            quote: "Upgrades, people, upgrades.<br>-Phineas T. Ratched"
-        },
-        sort: function(array){
-            array.sort((a, b) => {
-                let aTier = UpgradeTiers[a.name];
-                let bTier = UpgradeTiers[b.name];
-                if(!aTier || !bTier) return 0;
-                let aTierNextUnlock = 0;
-                for(let i = 0; i < aTier.length; i++){
-                    if(aTier[i] > a.amount){
-                        aTierNextUnlock = aTier[i];
-                        break;
-                    }
-                }
-
-                let bTierNextUnlock = 0;
-                for(let i = 0; i < bTier.length; i++){
-                    if(bTier[i] > b.amount){
-                        bTierNextUnlock = bTier[i];
-                        break;
-                    }
-                }
-                if(aTierNextUnlock === 0){
-                    return bTierNextUnlock === 0 ? 0 : 1;
-                }
-                else if(bTierNextUnlock === 0) return -1;
-
-                return (a.getSumPrice(aTierNextUnlock - a.amount)) - (b.getSumPrice(bTierNextUnlock - b.amount));
-            });
-            return array;
-        }
-    },
-    {
-        enabled: false,
-        sorterFrom:"BuildingSorter",
-        text: "Custom Sorter",
-        description: "The custom sorter option that you can code yourself and then run.",
-        tooltip: {
-            icon: [0, 4],
-            title: "Custom Sorter",
-            forwardDescription: "Who knows what this does, <b>you</b> coded it.",
-            reverseDescription: "Who knows what this does, <b>you</b> coded it. All I know is that reverse is enabled.",
-            quote: "Are you sure you know what you are doing?"
-        },
-        sort: function(array){
-            let toPassIn = Array.from(array);
-            let toReturnBack = toPassIn;
-            let ranSuccesfully = true;
-            try{
-                let customSorterFunction= new Function(customSorter)();
-                let returnedArray = customSorterFunction(toPassIn);
-
-                if(returnedArray instanceof Array){
-                    toReturnBack = returnedArray;
-                }
-
-                //Insert back any objects that might have been skipped.
-                //No we cannot hide any Objects, the best you can do is make their display="none" and then set them at the bottom of the list.
-                let ids = [];
-                for(let i = 0; i < toReturnBack.length; i++){
-                    if(toReturnBack[i] && typeof toReturnBack[i] === "object" && typeof toReturnBack[i].id != "undefined"){
-                        ids.push(toReturnBack[i].id);
-                    }
-                }
-                for(let i = 0; i < array.length; i++){
-                    if(!ids.includes(array[i].id)){
-                        toReturnBack.push(array[i]);
-                    }
-                }
-            }
-            catch(e){
-                incrementSorterType();
-                if(Date.now() - startTime < 60000 * 2){//if error occurs within the first 2 minutes of being loaded.
-                    Game.Prompt(`<h3 style="color:red">CustomSorter Error Occured</h3><div class="block">${cleanError(e)}</div><br><br><p style="text-align: justify-all">I've noticed, that only <span class="ModBuildingSorter_codeStyle">${Math.floor((Date.now() - startTime)/1000)} seconds</span> has passed.<br>Don't worry, your CustomSorter <b><em>probably</em></b> depends on another mod that hasn't fully loaded yet. Double check the mod has been initialized before using CustomSorter again.</p>`, [["Understood.", "Game.ClosePrompt();"]]);
-                }
-                else{
-                    Game.Prompt(`<h3 style="color:red">CustomSorter Error Occured</h3><div class="block">${cleanError(e)}</div>`, [["Understood.", "Game.ClosePrompt();"]]);
-                }
-            }
-            if(ranSuccesfully) return toReturnBack;
-            else return toPassIn;
-        }
-    },
-    {
-        enabled: false,
-        sorterFrom:"CookieMonster",
-        enabledIfMyModIsEnabled: true,
-        text: "Payback Period",
-        description: "Sort the display of buildings by CookieMonster's Payback Period",
-        tooltip: {
-            icon: [10, 28],
-            title: "CookieMonster's Payback Period",
-            forwardDescription: "Sort the display of buildings by CookieMonster's lowest <b>P</b>ayback <b>P</b>eriod.",
-            reverseDescription: "Sort the display of buildings by CookieMonster's highest <b>P</b>ayback <b>P</b>eriod.",
-            quote: "C is for cookie that's good enough for me.<br>-Cookie Monster"
-        },
-        sort: function(array){
-            if(!CookieMonsterEnabled) return array;
-            let objectToUse = CookieMonsterData.Objects1;
-            if(Game.buyBulk === 10) objectToUse = CookieMonsterData.Objects10;
-            if(Game.buyBulk === 100) objectToUse = CookieMonsterData.Objects100;
-            array.sort((a, b) => {
-                if(objectToUse[a.name] && objectToUse[b.name]) return objectToUse[a.name].pp - objectToUse[b.name].pp;
-                else return 0;
-            })
-            return array;
-        }
-    },
-    {
-        enabled: false,
-        sorterFrom:"FrozenCookies",
-        enabledIfMyModIsEnabled: true,
-        text: "Efficiency",
-        description: "Sort the display of buildings by FrozenCookie's Efficiency recommendation.",
-        tooltip: {
-            icon: [10, 2],
-            title: "FrozenCookie's Efficiency",
-            forwardDescription: "Sort the display of buildings by FrozenCookie's most efficient recommendation.",
-            reverseDescription: "Sort the display of buildings by FrozenCookie's worst efficient recommendation.",
-            quote: "Cookie Dough tastes better Frozen. Hence FrozenCookies"
-        },
-        sort: function(array){
-            if(!FrozenCookiesEnabled) return array;
-            //recommendationList() includes upgrades. Sort them out.
-            let recommends = recommendationList();
-            let recommendationBuildings = [];
-            for(let i =0;i<recommends.length;i++){
-                if(recommends[i].type === "building"){
-                    recommendationBuildings.push(recommends[i].purchase);
-                    if(recommendationBuildings.length === array.length) break;
-                }
-            }
-            //[recommendationBuildings] is a list of JUST buildings, recommended in order by FrozenCookies
-            array = recommendationBuildings;
-            array.sort((a,b)=>{
-                if(a.amount >= 500) return 1;
-                else if(b.amount >= 500) return -1;
-                else return 0;
-            })
-            return array;
-        }
-    },
-];
 // ==Create CSS==
 let CSSFILE = `
     #ModBuildingSorter_selectHolder{
@@ -439,18 +182,6 @@ function cleanError(text){
     else return text;
 }
 
-function incrementSorterType(){
-    sorterType++;
-    if(sorterType === sortersOptions.length) sorterType = 0;
-    if(!sortersOptions[sorterType].enabled){
-        incrementSorterType();
-    }
-    else{
-        changeables.children[0].innerText = sortersOptions[sorterType].text;
-        sort();
-    }
-}
-
 function directionButtonTooltip(){
     return `<div style="padding:8px 4px;min-width:350px;">
             <div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:-${11 * 48}px -${10 * 48}px;"></div>
@@ -474,7 +205,7 @@ function affordableButtonTooltip(){
 }
 
 function createToolTip(){
-    let tooltip = sortersOptions[sorterType].tooltip;
+    let tooltip = BuildingSorter.sorters[BuildingSorter.currentSorter].tooltip;
     return `
         <div style="padding:8px 4px;min-width:350px;">
             <div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:-${tooltip.icon[0] * 48}px -${tooltip.icon[1] * 48}px;"></div>
@@ -516,60 +247,9 @@ function updateBuildingAnimations(){
     products.style["-ms-transition"] = `all ${timer} ease`;
 }
 
-function sort(){
-    if(BuildingSorter.settings.disabledMod){
-        ObjectsToSort = Object.values(Game.Objects);
-        for(let i = 0; i < ObjectsToSort.length; i++){
-            ObjectsToSort[i].l.style.top = "0px";
-            ObjectsToSort[i].l.style.position = "inherit";
-        }
-        return;
-    }
-    if(!sortersOptions[sorterType].enabled){
-        incrementSorterType();
-    }
-    Game.tooltip.update();
-    ObjectsToSort = Object.values(Game.Objects);
-    ObjectsToSort.sort((a, b) => a.id - b.id);
-    if(onlyCanAfford){
-        let arrayToSort1 = [];//Affordable
-        let arrayToSort2 = [];//Unaffordable
-        for(let i = 0; i < ObjectsToSort.length; i++){
-            if(ObjectsToSort[i].bulkPrice <= Game.cookies){
-                arrayToSort1.push(ObjectsToSort[i]);
-            }
-            else arrayToSort2.push(ObjectsToSort[i]);
-        }
-        arrayToSort1 = sortersOptions[sorterType].sort(arrayToSort1);
-        arrayToSort2 = sortersOptions[sorterType].sort(arrayToSort2);
-        if(!forwardDirection){
-            arrayToSort1 = arrayToSort1.reverse();
-            arrayToSort2 = arrayToSort2.reverse();
-        }
-        ObjectsToSort = arrayToSort1.concat(arrayToSort2);
-    }
-    else{
-        ObjectsToSort = sortersOptions[sorterType].sort(ObjectsToSort);
-        if(!forwardDirection){
-            ObjectsToSort = ObjectsToSort.reverse();
-        }
-    }
-    let skips = 0;
-    if(!BuildingSorter.settings.disabledMod) products.style.display = "block";
-    for(let i = 0; i < ObjectsToSort.length; i++){
-        let obj = ObjectsToSort[i].l;
-        if(obj.classList.contains("toggledOff")){
-            skips++;
-            continue;
-        }
-        obj.style.top = (obj.clientHeight * ((i - skips) - ObjectsToSort[i].id)) + "px";
-        obj.style.position = "relative";
-    }
-}
-
 function updateSorterButtons(){
     if(!changeables) return;
-    changeables.children[0].innerText = sortersOptions[sorterType].text;
+    changeables.children[0].innerText = BuildingSorter.sorters[BuildingSorter.currentSorter].text;
     changeables.children[1].innerText = forwardDirection ? "▲" : "▼";
     changeables.children[2].style.color = onlyCanAfford ? "#59FF00" : "#FF0000";
     changeables.children[0].style.display = BuildingSorter.settings.showSorterChanger ? "block" : "none";
@@ -578,7 +258,7 @@ function updateSorterButtons(){
     sorterElement.style.display = (!BuildingSorter.settings.showSorterChanger && !BuildingSorter.settings.showDirectionChanger && !BuildingSorter.settings.showOnlyCanAfford) ? "none" : "block";
 }
 
-function addSorter(){
+function addSorterElement(){
     if(sorterElement !== null){
         sorterElement.remove();
         sorterElement = null;
@@ -599,8 +279,8 @@ function addSorter(){
     sorterButton.style.width = "100px";
     sorterButton.style.whiteSpace = "nowrap";
     sorterButton.onclick = function(){
-        incrementSorterType();
-        sorterButton.innerText = sortersOptions[sorterType].text;
+        BuildingSorter.incrementCurrentSorter();
+        sorterButton.innerText = BuildingSorter.sorters[BuildingSorter.currentSorter].text;
 
     };
     changeables.appendChild(sorterButton);
@@ -610,7 +290,7 @@ function addSorter(){
     sorterDirectionButton.onclick = function(){
         forwardDirection = !forwardDirection;
         sorterDirectionButton.innerText = forwardDirection ? "▲" : "▼";
-        sort();
+        BuildingSorter.runCurrentSorter();
     };
     changeables.appendChild(sorterDirectionButton);
     Game.attachTooltip(sorterDirectionButton, directionButtonTooltip, "store");
@@ -620,7 +300,7 @@ function addSorter(){
     affordableButton.onclick = function(){
         onlyCanAfford = !onlyCanAfford;
         affordableButton.style.color = onlyCanAfford ? "#59FF00" : "#FF0000";
-        sort();
+        BuildingSorter.runCurrentSorter();
     };
     Game.attachTooltip(affordableButton, affordableButtonTooltip, "store");
     changeables.appendChild(affordableButton);
@@ -699,7 +379,7 @@ function popUpCustomSorterCoder(){
     lines.spellcheck = false;
     let code = document.createElement("textarea");
     code.id = "ModBuildingSorter_code";
-    code.value = customSorter;
+    code.value = BuildingSorter.customSorter;
     code.spellcheck = false;
     codeContainer.appendChild(lines);
     codeContainer.appendChild(code);
@@ -748,8 +428,8 @@ function popUpCustomSorterCoder(){
     close.classList.add("option");
     close.innerText = "Close";
     close.onclick = function(){
-        if(customSorter.trim() != code.value.trim()){
-            Game.Prompt("<h3>Closing without saving</h3><div class=\"block\">Do you REALLY want to close without saving?<br><small>You will lose your code and revert to what was stored before.</small></div>", [["Close anyways.", "Game.ClosePrompt();Game.mods.BuildingSorter.prompt.customPrompt.remove();"], "Go Back!"]);
+        if(BuildingSorter.customSorter.trim() != code.value.trim()){
+            Game.Prompt("<h3>Closing without saving</h3><div class=\"block\">Do you REALLY want to close without saving?<br><small>You will lose your code and revert to what was stored before.</small></div>", [["Close anyways.", "Game.ClosePrompt();Game.mods.BuildingSorterprompt.customPrompt.remove();"], "Go Back!"]);
         }
         else prompt.customPrompt.remove();
     };
@@ -812,7 +492,7 @@ function popUpCustomSorterCoder(){
                 if(success){
                     save.classList.remove("ModBuildingSorter_unsaved");
                     Game.Notify("Success", `Successfully tested & saved your code.`, [22, 30], true);
-                    customSorter = code.value;
+                    BuildingSorter.customSorter = code.value;
                     Game.saveModData();
                 }
             }
@@ -858,22 +538,22 @@ function addSettings(){
     settings.appendChild(settingsTitle);
     let description = document.createElement("div");
     description.classList.add("listing");
-    for(let i = 0; i < sortersOptions.length; i++){
-        if(!CookieMonsterEnabled && sortersOptions[i].sorterFrom === "CookieMonster") continue;
-        if(!FrozenCookiesEnabled && sortersOptions[i].sorterFrom === "FrozenCookies") continue;
+    for(let i = 0; i < BuildingSorter.sorters.length; i++){
+        if(!CookieMonsterEnabled && BuildingSorter.sorters[i].sorterFrom === "CookieMonster") continue;
+        if(!FrozenCookiesEnabled && BuildingSorter.sorters[i].sorterFrom === "FrozenCookies") continue;
         if(i !== 0){
             description.appendChild(document.createElement("br"));
             description.appendChild(document.createElement("br"));
         }
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
-        checkbox.checked = sortersOptions[i].enabled;
+        checkbox.checked = BuildingSorter.sorters[i].enabled;
         description.appendChild(checkbox);
         let bolded = document.createElement("b");
-        bolded.style.opacity = sortersOptions[i].enabled ? "1" : "0.5";
-        bolded.innerText = sortersOptions[i].text;
+        bolded.style.opacity = BuildingSorter.sorters[i].enabled ? "1" : "0.5";
+        bolded.innerText = BuildingSorter.sorters[i].text;
         description.appendChild(bolded);
-        if(sortersOptions[i].text === "Custom Sorter"){
+        if(BuildingSorter.sorters[i].text === "Custom Sorter"){
             let customSorterButton = document.createElement("a");
             customSorterButton.classList.add("option");
             customSorterButton.innerText = "Edit";
@@ -883,30 +563,30 @@ function addSettings(){
             description.appendChild(customSorterButton);
         }
         let label = document.createElement("label");
-        label.innerText = sortersOptions[i].description;
-        label.style.opacity = sortersOptions[i].enabled ? "0.5" : "0.25";
+        label.innerText = BuildingSorter.sorters[i].description;
+        label.style.opacity = BuildingSorter.sorters[i].enabled ? "0.5" : "0.25";
         description.appendChild(label);
         checkbox.oninput = function(){
-            sortersOptions[i].enabled = this.checked;
+            BuildingSorter.sorters[i].enabled = this.checked;
             if(this.checked === false){
                 let atLeastOneEnabled = false;
-                for(let j = 0; j < sortersOptions.length; j++){
-                    if(sortersOptions[j].enabled){
+                for(let j = 0; j < BuildingSorter.sorters.length; j++){
+                    if(BuildingSorter.sorters[j].enabled){
                         atLeastOneEnabled = true;
                         break;
                     }
                 }
                 if(!atLeastOneEnabled){
-                    sortersOptions[i].enabled = true;
+                    BuildingSorter.sorters[i].enabled = true;
                     this.checked = true;
                     Game.Notify("Can't do that.", `You have to have at least ONE sorter enabled at all times. If you'd like to disable the sorter, the Building Sorter settings page has a DISABLE MOD option.`, [1, 7], false);
                 }
             }
-            if(!sortersOptions[i].enabled && sorterType === i){
-                incrementSorterType();
+            if(!BuildingSorter.sorters[i].enabled && BuildingSorter.currentSorter === i){
+                BuildingSorter.incrementCurrentSorter();
             }
-            bolded.style.opacity = sortersOptions[i].enabled ? "1" : "0.5";
-            label.style.opacity = sortersOptions[i].enabled ? "0.5" : "0.25";
+            bolded.style.opacity = BuildingSorter.sorters[i].enabled ? "1" : "0.5";
+            label.style.opacity = BuildingSorter.sorters[i].enabled ? "0.5" : "0.25";
         };
     }
     settings.appendChild(description);
@@ -936,7 +616,7 @@ function addSettings(){
         products.style.display = "grid";//CookieMonster requires this. I'd rather not break a well known mod. But shame it doesn't update this itself.
         sorterElement.style.display = BuildingSorter.settings.disabledMod ? "none" : "flex";
         updateBuildingAnimations();
-        sort();
+        BuildingSorter.runCurrentSorter();
     });
     createSettingsButton(BuildingSorter.CheckForUpdates ? "Allowing checks for updates" : "Staying offline", "Whether to check if the mod has updates or not.", buttonsHolder, function(){
         BuildingSorter.CheckForUpdates = !BuildingSorter.CheckForUpdates;
@@ -997,63 +677,347 @@ function updateWithPatchNote(oldVersion, newVersion, patchnotes){
     }, 10000);
 }
 
+class BuildingSorter {
+    get loadedVersion(){
+        return this._loadedVersion;
+    }
+    get version(){
+        return version
+    }
+    get currentSorter(){
+        return this._currentSorter;
+    }
+    constructor(){
+        this._loadedVersion = "";
+        this._currentSorter = 0;
+        this.CheckForUpdates = true;
+        this.DisableNotif = false;
+        this.showPatchNotes = true;
+        this.prompt = null;
+        this.sorters = [
+            {
+                enabled: true,
+                sorterFrom:"BuildingSorter",
+                text: "Built In",
+                description: "Sort's building's by their ID's number. This ranks them in order how they were designed to be displayed. This theoretically works with mods that adds new options so long as their ID is a number.",
+                tooltip: {
+                    icon: [10, 0],
+                    title: "Built In",
+                    forwardDescription: "Orders the buildings based on their <b>built in</b> order.",
+                    reverseDescription: "Orders the buildings based on their <b>built in</b> order but backwards.",
+                    quote: "Classic Ortiel's List."
+                },
+                sort: function(array){
+                    array.sort((a, b) => a.id - b.id);
+                    return array;
+                }
+            },
+            {
+                enabled: true,
+                sorterFrom:"BuildingSorter",
+                text: "Amount",
+                description: "Sort's building's by showing the buildings that you own less of towards the top.",
+                tooltip: {
+                    icon: [10, 33],
+                    title: "Amount",
+                    forwardDescription: "Places the buildings you own the <b>least</b> of at the top.",
+                    reverseDescription: "Places the buildings you own the <b>most</b> of at the top.",
+                    quote: "Ever heard of something called, a Monopoly?"
+                },
+                sort: function(array){
+                    array.sort((a, b) => a.amount - b.amount);
+                    return array;
+                }
+            },
+            {
+                enabled: true,
+                sorterFrom:"BuildingSorter",
+                text: "Price",
+                description: "Grabs each building's current price for buying only 1 of that building, then ranks them based on lowest price.",
+                tooltip: {
+                    icon: [3, 5],
+                    title: "Price",
+                    forwardDescription: "Places the current cheapest building at the top.",
+                    reverseDescription: "Places the current costliest building at the top.",
+                    quote: "Where shall I spend this dough?"
+                },
+                sort: function(array){
+                    array.sort((a, b) => a.bulkPrice - b.bulkPrice);
+                    return array;
+                }
+            },
+            {
+                enabled: true,
+                sorterFrom:"BuildingSorter",
+                text: "CPS",
+                description: "Grabs how much each building is producing in CPS, and ranks them based on which is currently producing the most.",
+                tooltip: {
+                    icon: [21, 6],
+                    title: "CPS",
+                    forwardDescription: "Places buildings generating the highest <b>C</b>ookies <b>P</b>er <b>S</b>econd at the top.",
+                    reverseDescription: "Places buildings generating the lowest <b>C</b>ookies <b>P</b>er <b>S</b>econd at the top.",
+                    quote: "So YOU are my most valuable possession."
+                },
+                sort: function(array){
+                    array.sort((a, b) => b.storedTotalCps - a.storedTotalCps);
+                    return array;
+                }
+            },
+            {
+                enabled: true,
+                sorterFrom:"BuildingSorter",
+                text: "Next Achievement",
+                description: "Calculates how many of each building you need to buy to unlock the next achievement, and ranks them from cheapest total cost of buying all said buildings",
+                tooltip: {
+                    icon: [32, 33],
+                    title: "Next Achievement",
+                    forwardDescription: "Calculates how many buildings you need to buy to unlock the next achievement, and then places lowest total price at the top.",
+                    reverseDescription: "Calculates how many buildings you need to buy to unlock the next achievement, and then places highest total price at the top.",
+                    quote: "Achievement hunter. But it costs cookies."
+                },
+                sort: function(array){
+                    array.sort((a, b) => {
+                        let aTier = 0;
+                        let bTier = 0;
+                        let aRemainder = Infinity;
+                        let bRemainder = Infinity;
+                        for(let i = 0; i < buildingAchievementTiers.length; i++){
+                            if(a.amount >= buildingAchievementTiers[i]) aTier = i;
+                            if(b.amount >= buildingAchievementTiers[i]) bTier = i;
+                        }
+                        if(buildingAchievementTiers[aTier + 1]) aRemainder = buildingAchievementTiers[aTier + 1] - a.amount;
+                        if(buildingAchievementTiers[bTier + 1]) bRemainder = buildingAchievementTiers[bTier + 1] - b.amount;
+                        if(isFinite(aRemainder) && isFinite(bRemainder)){
+                            return a.getSumPrice(aRemainder) - b.getSumPrice(bRemainder);
+                        }
+                        else return a.id - b.id;
+                    });
+                    return array;
+                }
+            },
+            {
+                enabled: true,
+                sorterFrom:"BuildingSorter",
+                text: "Next Upgrade",
+                description: "Calculates how many of each building you need to buy to unlock the next upgrade, and ranks them from cheapest total cost of buying all said buildings",
+                tooltip: {
+                    icon: [29, 7],
+                    title: "Next Upgrade",
+                    forwardDescription: "Calculates how many buildings you need to buy to unlock the next upgrade, and then places lowest total price at the top.",
+                    reverseDescription: "Calculates how many buildings you need to buy to unlock the next upgrade, and then places highest total price at the top.",
+                    quote: "Upgrades, people, upgrades.<br>-Phineas T. Ratched"
+                },
+                sort: function(array){
+                    array.sort((a, b) => {
+                        let aTier = UpgradeTiers[a.name];
+                        let bTier = UpgradeTiers[b.name];
+                        if(!aTier || !bTier) return 0;
+                        let aTierNextUnlock = 0;
+                        for(let i = 0; i < aTier.length; i++){
+                            if(aTier[i] > a.amount){
+                                aTierNextUnlock = aTier[i];
+                                break;
+                            }
+                        }
 
-const BuildingSorter = {
-    loadedVersion:version,
-    version:version,
-    CheckForUpdates: 1,
-    DisableNotif: 0,
-    showPatchNotes: null,
-    prompt: null,
-    sorters:[],
-    settings:{
-        showSorterChanger:true,
-        showDirectionChanger:true,
-        showOnlyCanAfford:true,
-        animateBuildings:true,
-        disabledMod: false,
-        CheckForUpdates:true,
-    },
+                        let bTierNextUnlock = 0;
+                        for(let i = 0; i < bTier.length; i++){
+                            if(bTier[i] > b.amount){
+                                bTierNextUnlock = bTier[i];
+                                break;
+                            }
+                        }
+                        if(aTierNextUnlock === 0){
+                            return bTierNextUnlock === 0 ? 0 : 1;
+                        }
+                        else if(bTierNextUnlock === 0) return -1;
 
-    init: function(){
-        console.log("init")
-        Game.registerHook("logic", function(value){
+                        return (a.getSumPrice(aTierNextUnlock - a.amount)) - (b.getSumPrice(bTierNextUnlock - b.amount));
+                    });
+                    return array;
+                }
+            },
+            {
+                enabled: false,
+                sorterFrom:"BuildingSorter",
+                text: "Custom Sorter",
+                description: "The custom sorter option that you can code yourself and then run.",
+                tooltip: {
+                    icon: [0, 4],
+                    title: "Custom Sorter",
+                    forwardDescription: "Who knows what this does, <b>you</b> coded it.",
+                    reverseDescription: "Who knows what this does, <b>you</b> coded it. All I know is that reverse is enabled.",
+                    quote: "Are you sure you know what you are doing?"
+                },
+                sort: function(array){
+                    let toPassIn = Array.from(array);
+                    let toReturnBack = toPassIn;
+                    let ranSuccesfully = true;
+                    try{
+                        let customSorterFunction= new Function(this.customSorter)();
+                        let returnedArray = customSorterFunction(toPassIn);
+
+                        if(returnedArray instanceof Array){
+                            toReturnBack = returnedArray;
+                        }
+
+                        //Insert back any objects that might have been skipped.
+                        //No we cannot hide any Objects, the best you can do is make their display="none" and then set them at the bottom of the list.
+                        let ids = [];
+                        for(let i = 0; i < toReturnBack.length; i++){
+                            if(toReturnBack[i] && typeof toReturnBack[i] === "object" && typeof toReturnBack[i].id != "undefined"){
+                                ids.push(toReturnBack[i].id);
+                            }
+                        }
+                        for(let i = 0; i < array.length; i++){
+                            if(!ids.includes(array[i].id)){
+                                toReturnBack.push(array[i]);
+                            }
+                        }
+                    }
+                    catch(e){
+                        BuildingSorter.incrementCurrentSorter();
+                        if(Date.now() - startTime < 60000 * 2){//if error occurs within the first 2 minutes of being loaded.
+                            Game.Prompt(`<h3 style="color:red">CustomSorter Error Occured</h3><div class="block">${cleanError(e)}</div><br><br><p style="text-align: justify-all">I've noticed, that only <span class="ModBuildingSorter_codeStyle">${Math.floor((Date.now() - startTime)/1000)} seconds</span> has passed.<br>Don't worry, your CustomSorter <b><em>probably</em></b> depends on another mod that hasn't fully loaded yet. Double check the mod has been initialized before using CustomSorter again.</p>`, [["Understood.", "Game.ClosePrompt();"]]);
+                        }
+                        else{
+                            Game.Prompt(`<h3 style="color:red">CustomSorter Error Occured</h3><div class="block">${cleanError(e)}</div>`, [["Understood.", "Game.ClosePrompt();"]]);
+                        }
+                    }
+                    if(ranSuccesfully) return toReturnBack;
+                    else return toPassIn;
+                }
+            },
+            {
+                enabled: false,
+                sorterFrom:"CookieMonster",
+                enabledIfMyModIsEnabled: true,
+                text: "Payback Period",
+                description: "Sort the display of buildings by CookieMonster's Payback Period",
+                tooltip: {
+                    icon: [10, 28],
+                    title: "CookieMonster's Payback Period",
+                    forwardDescription: "Sort the display of buildings by CookieMonster's lowest <b>P</b>ayback <b>P</b>eriod.",
+                    reverseDescription: "Sort the display of buildings by CookieMonster's highest <b>P</b>ayback <b>P</b>eriod.",
+                    quote: "C is for cookie that's good enough for me.<br>-Cookie Monster"
+                },
+                sort: function(array){
+                    if(!CookieMonsterEnabled) return array;
+                    let objectToUse = CookieMonsterData.Objects1;
+                    if(Game.buyBulk === 10) objectToUse = CookieMonsterData.Objects10;
+                    if(Game.buyBulk === 100) objectToUse = CookieMonsterData.Objects100;
+                    array.sort((a, b) => {
+                        if(objectToUse[a.name] && objectToUse[b.name]) return objectToUse[a.name].pp - objectToUse[b.name].pp;
+                        else return 0;
+                    })
+                    return array;
+                }
+            },
+            {
+                enabled: false,
+                sorterFrom:"FrozenCookies",
+                enabledIfMyModIsEnabled: true,
+                text: "Efficiency",
+                description: "Sort the display of buildings by FrozenCookie's Efficiency recommendation.",
+                tooltip: {
+                    icon: [10, 2],
+                    title: "FrozenCookie's Efficiency",
+                    forwardDescription: "Sort the display of buildings by FrozenCookie's most efficient recommendation.",
+                    reverseDescription: "Sort the display of buildings by FrozenCookie's worst efficient recommendation.",
+                    quote: "Cookie Dough tastes better Frozen. Hence FrozenCookies"
+                },
+                sort: function(array){
+                    if(!FrozenCookiesEnabled) return array;
+                    //recommendationList() includes upgrades. Sort them out.
+                    let recommends = recommendationList();
+                    let recommendationBuildings = [];
+                    for(let i =0;i<recommends.length;i++){
+                        if(recommends[i].type === "building"){
+                            recommendationBuildings.push(recommends[i].purchase);
+                            if(recommendationBuildings.length === array.length) break;
+                        }
+                    }
+                    //[recommendationBuildings] is a list of JUST buildings, recommended in order by FrozenCookies
+                    array = recommendationBuildings;
+                    array.sort((a,b)=>{
+                        if(a.amount >= 500) return 1;
+                        else if(b.amount >= 500) return -1;
+                        else return 0;
+                    })
+                    return array;
+                }
+            },
+        ];
+        this.customSorter = defaultCustomSorter;
+        this.settings = {
+            showSorterChanger:true,
+            showDirectionChanger:true,
+            showOnlyCanAfford:true,
+            animateBuildings:true,
+            disabledMod: false,
+            CheckForUpdates:true,
+        }
+    }
+
+    /**
+     * addSorterOption. Add's a sorter to the list of sorters, (this is not saved. Recommend using customSorter instead)
+     * @param name{String} Name of the sorter.
+     * @param description{String} The description shown in the settings.
+     * @param tooltip{Objects} The tooltip for when hovering over the sorter HTML element.
+     * @param tooltip.icon{Array} An array containing 2 numbers to represent coordinates in Ortiel's Icon collection.
+     * @param tooltip.title{String} The display name of the sorter.
+     * @param tooltip.forwardDescription{String} The description shown, when sorting normally.
+     * @param tooltip.reverseDescription{String} The description shown, when sorting reversed.
+     * @param tooltip.quote{String} A quick quip that usually is in jest, shown bottom right.
+     * @param sorter {Function} function that takes in an array, and returns a sorter version of it.
+     */
+    addSorterOption(name,description,tooltip,sorter){
+        this.sorters.push({
+            enabled:true,
+            sorterFrom:"console",
+            text:name,
+            description,
+            tooltip,
+            sort:sorter
+        });
+    }
+
+    init (){
+        Game.registerHook("logic", (value) => {
             addSettings();
-            sort();
+            this.runCurrentSorter();
             return value;
         });
         products = l("products");
         ObjectsToSort = Object.values(Game.Objects);
         createUpgradeTiers();
         updateBuildingAnimations();
-        addSorter();
-        sort();
-    },
+        addSorterElement();
+        this.runCurrentSorter();
+    }
 
-    save: function(){
-        console.log("save");
+    save (){
         let enabled = ``;
-        for(let i = 0; i < sortersOptions.length; i++){
-            enabled += (sortersOptions[i].enabled || sortersOptions[i].enabledIfMyModIsEnabled) ? `1` : `0`;
+        for(let i = 0; i < this.sorters.length; i++){
+            enabled += (this.sorters[i].enabled || this.sorters[i].enabledIfMyModIsEnabled) ? `1` : `0`;
         }
-        return `${version}ô${sorterType}ô${BuildingSorter.settings.animateBuildings ? 1 : 0}${BuildingSorter.settings.showSorterChanger ? 1 : 0}${BuildingSorter.settings.showDirectionChanger ? 1 : 0}${BuildingSorter.settings.showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${enabled}ô${customSorter === defaultCustomSorter ? "" : customSorter}`;
-    },
+        return `${version}ô${this.currentSorter}ô${this.settings.animateBuildings ? 1 : 0}${this.settings.showSorterChanger ? 1 : 0}${this.settings.showDirectionChanger ? 1 : 0}${this.settings.showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${!this.settings.disabledMod}ô${this.customSorter === defaultCustomSorter ? "" : this.customSorter}`;
+    }
 
-    load: function(str){
-        console.log("load")
+    load (str){
         /** HOW MY CODE HAS SAVED STUFF. Now documented because it was a pain to track this down.
          1.0
          - save split by |
-         - sorterType, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford,
+         - currentSorter, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford,
          1.2
          - save split by |
-         - sorterType, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford, disableNotif
+         - currentSorter, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford, disableNotif
          1.3
          - save split by |
-         - sorterType, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford, disableNotif, checkForUpdates, version
+         - currentSorter, animateBuildings, showSorterChange, showDirectionChange, showOnlyCanAfford, disableNotif, checkForUpdates, version
          2.0
          - save split by ô
-         - version, sorterType, BITFIELD-1, BITFIELD-2, customSorter
+         - version, currentSorter, BITFIELD-1, BITFIELD-2, customSorter
          - BITFIELD-1 = animateBuildings, showSorterChanger, showDirectionChanger, showOnlyCanAfford, this.DisableNotif, this.CheckForUpdates
          - BITFIELD-2 = Sorter_BuiltIn.enabled, Sorter_Amount.enabled, Sorter_Price.enabled, Sorter_CPS.enabled, Sorter_NextAchievement.enabled, Sorter_NextUpgrade.enabled, Sorter_Custom.enabled, Sorter_CookieMonsterPaybackPeriod.enabled, Sorter_FrozenCookiesEfficiency.enabled
          */
@@ -1062,7 +1026,7 @@ const BuildingSorter = {
         if(arr.length === 1){//Version 1.3 or below.
             arr = str.split("|");
             if(arr[0] && !isNaN(arr[0])){
-                sorterType = parseInt(arr[0], 10) || 0;
+                this.currentSorter = parseInt(arr[0], 10) || 0;
                 loadedVersion = "1.0";
             }
             if(arr[1] && !isNaN(arr[1])) this.settings.animateBuildings = parseInt(arr[1], 10) === 1;
@@ -1080,7 +1044,7 @@ const BuildingSorter = {
         }
         else{//Version 2 or higher
             if(arr[0]) loadedVersion = arr[0];
-            if(arr[1]) sorterType = parseInt(arr[1], 10) || 0;
+            if(arr[1]) this.currentSorter = parseInt(arr[1], 10) || 0;
             if(arr[2]){
                 let booleans = arr[2].split("");
                 if(booleans[0]) this.settings.animateBuildings = parseInt(booleans[0], 10) === 1;
@@ -1093,32 +1057,95 @@ const BuildingSorter = {
             if(arr[3]){
                 let enabled = arr[3].split("");
                 for(let i = 0; i < enabled.length; i++){
-                    if(sortersOptions[i]){
-                        if(sortersOptions[i].sorterFrom === "CookieMonster") sortersOptions[i].enabledIfMyModIsEnabled = (parseInt(enabled[i], 10) === 1);
-                        if(sortersOptions[i].sorterFrom === "FrozenCookies") sortersOptions[i].enabledIfMyModIsEnabled = (parseInt(enabled[i], 10) === 1);
-                        else sortersOptions[i].enabled = (parseInt(enabled[i], 10) === 1);
+                    if(this.sorters[i]){
+                        if(this.sorters[i].sorterFrom === "CookieMonster") this.sorters[i].enabledIfMyModIsEnabled = (parseInt(enabled[i], 10) === 1);
+                        if(this.sorters[i].sorterFrom === "FrozenCookies") this.sorters[i].enabledIfMyModIsEnabled = (parseInt(enabled[i], 10) === 1);
+                        else this.sorters[i].enabled = (parseInt(enabled[i], 10) === 1);
                     }
                 }
             }
             if(arr[4]){
-                customSorter = arr[4];
+                this.customSorter = arr[4];
             }
         }
         this.loadedVersion = `${loadedVersion}`;
-        if(sorterType < 0) sorterType = 0;
-        if(sorterType >= sortersOptions.length) sorterType = 0;
-        if(isNaN(sorterType)) sorterType = 0;
+        if(this.currentSorter < 0) this.currentSorter = 0;
+        if(this.currentSorter >= this.sorters.length) this.currentSorter = 0;
+        if(isNaN(this.currentSorter)) this.currentSorter = 0;
         updateSorterButtons();
         updateBuildingAnimations();
-        sort();
+        this.runCurrentSorter();
         if(this.DisableNotif === 0) Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully, check the settings for more info about how the mod sorts.<a style="float:right;" onclick="Game.mods.BuildingSorter.DisableNotif=1;==CLOSETHIS()==">Don't show this again</a>`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], false);
         else Game.Notify("Building Sorter", `The mod 'Building Sorter' has loaded v${version} successfully`, [0.25, 0.25, "http://orteil.dashnet.org/cookieclicker/img/factory.png"], true);
         if(this.CheckForUpdates === 1){
             this.checkForUpdate();
         }
-    },
+    }
 
-    checkForUpdate: function(){
+    incrementCurrentSorter(){
+        this._currentSorter++;
+        if(this.currentSorter === this.sorters.length) this.currentSorter = 0;
+        if(!this.sorters[this.currentSorter].enabled){
+            this.incrementCurrentSorter();
+        }
+        else{
+            changeables.children[0].innerText = this.sorters[this.currentSorter].text;
+            this.runCurrentSorter();
+        }
+    }
+
+    runCurrentSorter (){
+        if(this.settings.disabledMod){
+            ObjectsToSort = Object.values(Game.Objects);
+            for(let i = 0; i < ObjectsToSort.length; i++){
+                ObjectsToSort[i].l.style.top = "0px";
+                ObjectsToSort[i].l.style.position = "inherit";
+            }
+            return;
+        }
+        if(!this.sorters[this.currentSorter].enabled){
+            this.incrementCurrentSorter();
+        }
+        Game.tooltip.update();
+        ObjectsToSort = Object.values(Game.Objects);
+        ObjectsToSort.sort((a, b) => a.id - b.id);
+        if(onlyCanAfford){
+            let arrayToSort1 = [];//Affordable
+            let arrayToSort2 = [];//Unaffordable
+            for(let i = 0; i < ObjectsToSort.length; i++){
+                if(ObjectsToSort[i].bulkPrice <= Game.cookies){
+                    arrayToSort1.push(ObjectsToSort[i]);
+                }
+                else arrayToSort2.push(ObjectsToSort[i]);
+            }
+            arrayToSort1 = this.sorters[this.currentSorter].sort(arrayToSort1);
+            arrayToSort2 = this.sorters[this.currentSorter].sort(arrayToSort2);
+            if(!forwardDirection){
+                arrayToSort1 = arrayToSort1.reverse();
+                arrayToSort2 = arrayToSort2.reverse();
+            }
+            ObjectsToSort = arrayToSort1.concat(arrayToSort2);
+        }
+        else{
+            ObjectsToSort = this.sorters[this.currentSorter].sort(ObjectsToSort);
+            if(!forwardDirection){
+                ObjectsToSort = ObjectsToSort.reverse();
+            }
+        }
+        let skips = 0;
+        if(!this.settings.disabledMod) products.style.display = "block";
+        for(let i = 0; i < ObjectsToSort.length; i++){
+            let obj = ObjectsToSort[i].l;
+            if(obj.classList.contains("toggledOff")){
+                skips++;
+                continue;
+            }
+            obj.style.top = (obj.clientHeight * ((i - skips) - ObjectsToSort[i].id)) + "px";
+            obj.style.position = "relative";
+        }
+    }
+
+    checkForUpdate (){
         fetch("https://frustrated-programmer.github.io/BuildingSorter/version.txt").then((versionResponse) => {
             versionResponse.text().then((versionTextResult) => {
                 versionTextResult = versionTextResult.toString().toLowerCase().trim();
@@ -1136,16 +1163,16 @@ const BuildingSorter = {
             }).catch(console.error);
         }).catch(console.error);
     }
-};
+}
 
 const readyCheck = setInterval(() => {
     const theGame = Game || window.Game;
     if(typeof theGame !== "undefined" && typeof theGame.ready !== "undefined" && theGame.ready){
         startTime = Date.now();
-        theGame.registerMod("BuildingSorter", BuildingSorter);
+        theGame.registerMod("BuildingSorter", new BuildingSorter());
         clearInterval(readyCheck);
 
-        //Check for external mods after 1s, 5s, 10s, 30s, 60s since mod was loaded.
+        //Check for external mods after 1s, 5s, 10s, 30s, 60s since mod was first loaded.
         let timers = [1000,4000,5000,20000,30000];
         function checkForExternalMods(timerChecker){
             if(!timers[timerChecker]) return;
@@ -1153,9 +1180,9 @@ const readyCheck = setInterval(() => {
                 //Check for CookieMonster
                 if(!CookieMonsterEnabled && !!(theGame && theGame.mods && theGame.mods.CookieMonster && CookieMonsterData && CookieMonsterData.Objects1 && CookieMonsterData.Objects10 && CookieMonsterData.Objects100)){
                     CookieMonsterEnabled = true;
-                    for(let i = 0; i < sortersOptions.length; i++){
-                        if(sortersOptions[i].sorterFrom === "CookieMonster") {
-                            sortersOptions[i].enabled = sortersOptions[i].enabledIfMyModIsEnabled;
+                    for(let i = 0; i < BuildingSorter.sorters.length; i++){
+                        if(BuildingSorter.sorters[i].sorterFrom === "CookieMonster") {
+                            BuildingSorter.sorters[i].enabled = BuildingSorter.sorters[i].enabledIfMyModIsEnabled;
                             break;
                         }
                     }
@@ -1167,9 +1194,9 @@ const readyCheck = setInterval(() => {
                  */
                 if(!FrozenCookiesEnabled && !!(theGame && theGame.mods && (theGame.mods.frozen_cookies || theGame.mods["Frozen Cookies mtarnuhal "]) && FrozenCookies && typeof recommendationList === "function")){
                     FrozenCookiesEnabled = true;
-                    for(let i = 0; i < sortersOptions.length; i++){
-                        if(sortersOptions[i].sorterFrom === "FrozenCookies") {
-                            sortersOptions[i].enabled = sortersOptions[i].enabledIfMyModIsEnabled;
+                    for(let i = 0; i < BuildingSorter.sorters.length; i++){
+                        if(BuildingSorter.sorters[i].sorterFrom === "FrozenCookies") {
+                            BuildingSorter.sorters[i].enabled = BuildingSorter.sorters[i].enabledIfMyModIsEnabled;
                             break;
                         }
                     }
