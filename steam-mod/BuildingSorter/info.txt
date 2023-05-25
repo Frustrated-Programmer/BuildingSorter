@@ -3,7 +3,7 @@
 	"ID": "BuildingSorter",
 	"Author": "FrustratedProgrammer",
 	"Description": "Sorts the building list on the right in multiple different ways.",
-	"ModVersion": 2.4,
+	"ModVersion": 2.5,
 	"GameVersion": 2.052,
 	"Date": "5/24/2023",
 	"Dependencies": [],

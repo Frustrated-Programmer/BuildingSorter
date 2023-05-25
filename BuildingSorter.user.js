@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      2.4
+// @version      2.5
 // @description  Allows you to runCurrentSorter the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/

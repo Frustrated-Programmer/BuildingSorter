@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Building Sorter
-// @version      2.4
+// @version      2.5
 // @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
@@ -36,7 +36,7 @@
 // do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.4";
+const version = "2.5";
 const uniqueCharacter = "ô";
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==USER CHANGEABLE== (but not saved)
@@ -996,6 +996,14 @@ class BuildingSorterClass {
         updateBuildingAnimations();
         addSorterElement();
         this.runCurrentSorter();
+        let possibleBackupSave = window.localStorage.getItem("CCBuildingSorterSave");
+        if(possibleBackupSave){
+            setTimeout(() => {
+                if(!this._loadedVersion.length){
+                    this.load(possibleBackupSave)
+                }
+            }, 5000)
+        }
     }
 
     save (){
@@ -1003,7 +1011,14 @@ class BuildingSorterClass {
         for(let i = 0; i < this.sorters.length; i++){
             enabled += (this.sorters[i].enabled || this.sorters[i].enabledIfMyModIsEnabled) ? `1` : `0`;
         }
-        return `${version}ô${this.currentSorter}ô${this.settings.animateBuildings ? 1 : 0}${this.settings.showSorterChanger ? 1 : 0}${this.settings.showDirectionChanger ? 1 : 0}${this.settings.showOnlyCanAfford ? 1 : 0}${this.DisableNotif === 1 ? 1 : 0}${this.CheckForUpdates === 1 ? 1 : 0}ô${!this.settings.disabledMod}ô${this.customSorter === defaultCustomSorter ? "" : this.customSorter}`;
+        let bitField = ``;
+        let settingsToCheck = [this.settings.animateBuildings,this.settings.showSorterChanger,this.settings.showDirectionChanger,this.settings.showOnlyCanAfford,this.DisableNotif,this.CheckForUpdates,this.settings.disabledMod];
+        for(let i =0;i<settingsToCheck.length;i++){
+            bitField += settingsToCheck[i] ? 1 : 0;
+        }
+        let saveFile = `${version}ô${this.currentSorter}ô${bitField}ô${enabled}ô${this.customSorter === defaultCustomSorter ? "" : this.customSorter}`
+        window.localStorage.setItem("CCBuildingSorterSave",saveFile);
+        return saveFile;
     }
 
     load (str){
@@ -1020,7 +1035,15 @@ class BuildingSorterClass {
          2.0
          - save split by ô
          - version, currentSorter, BITFIELD-1, BITFIELD-2, customSorter
-         - BITFIELD-1 = animateBuildings, showSorterChanger, showDirectionChanger, showOnlyCanAfford, this.DisableNotif, this.CheckForUpdates
+         - BITFIELD-1 = animateBuildings, showSorterChanger, showDirectionChanger, showOnlyCanAfford, DisableNotif, CheckForUpdates
+         - BITFIELD-2 = Sorter_BuiltIn.enabled, Sorter_Amount.enabled, Sorter_Price.enabled, Sorter_CPS.enabled, Sorter_NextAchievement.enabled, Sorter_NextUpgrade.enabled, Sorter_Custom.enabled, Sorter_CookieMonsterPaybackPeriod.enabled, Sorter_FrozenCookiesEfficiency.enabled
+         2.4
+         - Bugged saves.
+         - Saved as one thing, loaded as another.
+         2.5
+         - save split by ô
+         - version, currentSorter, BITFIELD-1, BITFIELD-2, customSorter
+         - BITFIELD-1 = animateBuildings, showSorterChanger, showDirectionChanger, showOnlyCanAfford, DisableNotif, CheckForUpdates, disabledMod
          - BITFIELD-2 = Sorter_BuiltIn.enabled, Sorter_Amount.enabled, Sorter_Price.enabled, Sorter_CPS.enabled, Sorter_NextAchievement.enabled, Sorter_NextUpgrade.enabled, Sorter_Custom.enabled, Sorter_CookieMonsterPaybackPeriod.enabled, Sorter_FrozenCookiesEfficiency.enabled
          */
         let loadedVersion = ""
@@ -1055,6 +1078,8 @@ class BuildingSorterClass {
                 if(booleans[3]) this.settings.showOnlyCanAfford = parseInt(booleans[3], 10) === 1;
                 if(booleans[4]) this.DisableNotif = parseInt(booleans[4], 10) === 1 ? 1 : 0;
                 if(booleans[5]) this.CheckForUpdates = parseInt(booleans[5], 10) === 1 ? 1 : 0;
+                if(booleans[6]) this.settings.disabledMod = parseInt(booleans[6], 10) === 1 ? 1 : 0;
+
             }
             if(arr[3]){
                 let enabled = arr[3].split("");

@@ -31,7 +31,12 @@
 	},
 	"2.4": {
 		"title": "Minor QoL Change",
-		"message": "FrozenCookies and CookieMonster sorters are now enabled by default.",
-		"html": "<ul><li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li><li>Minor improvements to checks for updates, and saving settings.</li><li>Sorting by upgrades, now won't recommend upgrades you've already purchased</li>\n<li>A lot more of the Mod's structure has been revealed and has more accessible via <span style=\"font-family: Monospace\">Game.mods.BuildingSorter</span></li></ul>"
+		"message": "FrozenCookies and CookieMonster sorters are now enabled by default.\nMinor improvements to checks for updates, and saving settings.\nSorting by upgrades, now won't recommend upgrades you've already purchased.\nA lot more of the Mod's structure has been revealed and has more accessible via Game.mods.BuildingSorter",
+		"html": "<ul><li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li><li>Minor improvements to checks for updates, and saving settings.</li><li>Sorting by upgrades, now won't recommend upgrades you've already purchased.</li>\n<li>A lot more of the Mod's structure has been revealed and has more accessible via <span style=\"font-family: Monospace\">Game.mods.BuildingSorter</span></li></ul>"
+	},
+	"2.5": {
+		"title":"Fixed Saving",
+		"message": "Saves were bugged out in v2.4. Fixed!\nRapid reloading caused saved settings to be removed in some browsers. Now a 24 character string is saved in localStorage to act as a backup.",
+		"html": "<ul><li>Saves were bugged out in v2.4. Fixed!</li><li>Rapid reloading caused saved settings to be removed in some browsers. Now a 24 character string is saved in localStorage to act as a backup.</li></ul>"
 	}
 }

@@ -1,4 +1,10 @@
 #Patch-notes
+## 2.5 Fixed Saving
+<ul>
+    <li>Saves were bugged out in v2.4. Fixed!</li>
+    <li>Rapid reloading caused saved settings to be removed in some browsers. Now a 24 character string is saved in localStorage to act as a backup.</li>
+</ul>
+
 ## 2.4 Minor QoL Change
 <ul>
     <li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li>
