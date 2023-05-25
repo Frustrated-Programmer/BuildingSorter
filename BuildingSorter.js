@@ -370,7 +370,7 @@ function popUpCustomSorterCoder(){
     lines.disabled = true;
     lines.spellcheck = false;
     let code = document.createElement("textarea");
-    code.style.display = "hidden";
+    //code.style.display = "hidden";
     code.id = "ModBuildingSorter_code";
     code.value = BuildingSorter.customSorter;
     code.spellcheck = false;
