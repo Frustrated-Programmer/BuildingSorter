@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Building Sorter
 // @version      2.3
-// @description  Allows you to runCurrentSorter the buildings in several different ways.
+// @description  Allows you to sort the buildings in several different ways.
 // @author       FrustratedProgrammer
 // @include      /https?://orteil.dashnet.org/cookieclicker/
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAKlBMVEWOOT9GUDHDv5BbGyqUbD7EaVf///+MjF5fMyB2Si08Fg5IHxMgDgr////9CbZGAAAADnRSTlP/////////////////AEXA3MgAAAFUSURBVHja7Jdtr4MgDIWBeaWl9f//3VtelosboCtbcpd45IPG9AHPKUbNNilzAb4CwFlqAHtrvXeeJwFmAnC7GfMzATDvAbzqwZ/1bDQmVtbrUqis16VQWa9LobJel0JlvS6Fyvorhe9LgU+pD2DoaMFa/DnAxqEjBCosIh55QB0tCGV6wAMAc2MkAKXjEBC4Mf4J4H58zMRx91EV464bzYtN9NRM7wOc6UJodGMFoHZ9ZSA2jNwBGvZDBpA0AHlRPu0CnucvAJAeknK7+njaBzCHhwH3R5B659ZVCKgByMqlXhSXoAZYa50dA/oe5BVY55UriB64NQNUHhAlwir1pEpBsks5yvyg6oOzndhbwX4zkMYD2X9ZiDoPEOV5MgA0mykC4vvyANDfzhkQCSPA4IVaAEKYBFAYAEK7PiySm+RYbkO6agFOfl08fmNcP57b9ivAAE0ItTfDUzdYAAAAAElFTkSuQmCC
@@ -32,7 +32,7 @@
 // implement color coding for the custom coder (so it's more like an IDE)
 // allow dragging/dropping sorting option.
 // implement adjustments to some sorters depending on whether the user is "selling" or "buying" (currently everything assumes you are buying)
-// update next achievement and next upgrade, to exclude achievements/upgrades you already own. (Prestige or Selling can reproduce)
+// update next achievement to exclude achievements you already own. (Prestige can reproduce)
 // do better error handling for CustomSorter
 
 // CONSTANTS
@@ -677,7 +677,7 @@ function updateWithPatchNote(oldVersion, newVersion, patchnotes){
     }, 10000);
 }
 
-class BuildingSorter {
+class BuildingSorterClass {
     get loadedVersion(){
         return this._loadedVersion;
     }
@@ -777,13 +777,15 @@ class BuildingSorter {
                 },
                 sort: function(array){
                     array.sort((a, b) => {
+
+
                         let aTier = 0;
                         let bTier = 0;
                         let aRemainder = Infinity;
                         let bRemainder = Infinity;
                         for(let i = 0; i < buildingAchievementTiers.length; i++){
-                            if(a.amount >= buildingAchievementTiers[i]) aTier = i;
-                            if(b.amount >= buildingAchievementTiers[i]) bTier = i;
+                            if(a.highest >= buildingAchievementTiers[i]) aTier = i;
+                            if(b.highest >= buildingAchievementTiers[i]) bTier = i;
                         }
                         if(buildingAchievementTiers[aTier + 1]) aRemainder = buildingAchievementTiers[aTier + 1] - a.amount;
                         if(buildingAchievementTiers[bTier + 1]) bRemainder = buildingAchievementTiers[bTier + 1] - b.amount;
@@ -814,7 +816,7 @@ class BuildingSorter {
                         if(!aTier || !bTier) return 0;
                         let aTierNextUnlock = 0;
                         for(let i = 0; i < aTier.length; i++){
-                            if(aTier[i] > a.amount){
+                            if(aTier[i] > a.highest){
                                 aTierNextUnlock = aTier[i];
                                 break;
                             }
@@ -822,7 +824,7 @@ class BuildingSorter {
 
                         let bTierNextUnlock = 0;
                         for(let i = 0; i < bTier.length; i++){
-                            if(bTier[i] > b.amount){
+                            if(bTier[i] > b.highest){
                                 bTierNextUnlock = bTier[i];
                                 break;
                             }
@@ -1026,7 +1028,7 @@ class BuildingSorter {
         if(arr.length === 1){//Version 1.3 or below.
             arr = str.split("|");
             if(arr[0] && !isNaN(arr[0])){
-                this.currentSorter = parseInt(arr[0], 10) || 0;
+                this._currentSorter = parseInt(arr[0], 10) || 0;
                 loadedVersion = "1.0";
             }
             if(arr[1] && !isNaN(arr[1])) this.settings.animateBuildings = parseInt(arr[1], 10) === 1;
@@ -1044,7 +1046,7 @@ class BuildingSorter {
         }
         else{//Version 2 or higher
             if(arr[0]) loadedVersion = arr[0];
-            if(arr[1]) this.currentSorter = parseInt(arr[1], 10) || 0;
+            if(arr[1]) this._currentSorter = parseInt(arr[1], 10) || 0;
             if(arr[2]){
                 let booleans = arr[2].split("");
                 if(booleans[0]) this.settings.animateBuildings = parseInt(booleans[0], 10) === 1;
@@ -1068,10 +1070,10 @@ class BuildingSorter {
                 this.customSorter = arr[4];
             }
         }
-        this.loadedVersion = `${loadedVersion}`;
-        if(this.currentSorter < 0) this.currentSorter = 0;
-        if(this.currentSorter >= this.sorters.length) this.currentSorter = 0;
-        if(isNaN(this.currentSorter)) this.currentSorter = 0;
+        this._loadedVersion = `${loadedVersion}`;
+        if(this.currentSorter < 0) this._currentSorter = 0;
+        if(this.currentSorter >= this.sorters.length) this._currentSorter = 0;
+        if(isNaN(this.currentSorter)) this._currentSorter = 0;
         updateSorterButtons();
         updateBuildingAnimations();
         this.runCurrentSorter();
@@ -1084,7 +1086,7 @@ class BuildingSorter {
 
     incrementCurrentSorter(){
         this._currentSorter++;
-        if(this.currentSorter === this.sorters.length) this.currentSorter = 0;
+        if(this.currentSorter === this.sorters.length) this._currentSorter = 0;
         if(!this.sorters[this.currentSorter].enabled){
             this.incrementCurrentSorter();
         }
@@ -1164,12 +1166,13 @@ class BuildingSorter {
         }).catch(console.error);
     }
 }
+let BuildingSorter = new BuildingSorterClass();
 
 const readyCheck = setInterval(() => {
     const theGame = Game || window.Game;
     if(typeof theGame !== "undefined" && typeof theGame.ready !== "undefined" && theGame.ready){
         startTime = Date.now();
-        theGame.registerMod("BuildingSorter", new BuildingSorter());
+        theGame.registerMod("BuildingSorter", BuildingSorter);
         clearInterval(readyCheck);
 
         //Check for external mods after 1s, 5s, 10s, 30s, 60s since mod was first loaded.

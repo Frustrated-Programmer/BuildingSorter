@@ -1,8 +1,10 @@
 #Patch-notes
-## 2.3 Minor QoL Change
+## 2.4 Minor QoL Change
 <ul>
     <li><i>FrozenCookies</i> and <i>CookieMonster</i> sorters are now enabled by default.</li>
     <li>Minor improvements to checks for updates, and saving settings.</li>
+    <li>Sorting by upgrades, now won't recommend upgrades you've already purchased</li>
+    <li>A lot more of the Mod's structure has been revealed and has more accessible via <span style="font-family: Monospace">Game.mods.BuildingSorter</span></li>
 </ul>
 
 
