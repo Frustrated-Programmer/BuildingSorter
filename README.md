@@ -28,19 +28,19 @@ If (for some reason) the above doesn't work, trying pasting everything after the
 
 ### Userscript
 
-If you'd rather use the addon as a [userscript](https://en.wikipedia.org/wiki/Userscript) to automatically load _Building Sorter_ every time the original game loads, install the `BuldingSorter.user.js` file. You can do this by clicking on the file in the file-list and clicking "raw".
+If you'd rather use the addon as an [userscript](https://en.wikipedia.org/wiki/Userscript) to automatically load _Building Sorter_ every time the original game loads, install the `BuldingSorter.user.js` file. You can do this by clicking on the file in the file-list and clicking "raw".
 
 ### Steam
 
-I don't OWN the Steam version, so I've just worked with the documentation. This should work with Steam version but I cannot test it myself. Let me know :D
+I don't OWN the Steam version, so I've just worked with the documentation. This should work with Steam version but I cannot test it myself.  But I did receive someone who reached out to let me know it does work!
 1. Download the `steam-mod` folder included in this repo.
 2. Move the folders of the mods you want into `<yoursteaminstall>\SteamApps\common\Cookie Clicker\resources\app\mods\local`, you can get to this from the mods menu.
 3. Enable them in-game with the mods menu.
 
 ## Files:
- * `BuildingSorter.js` is the source code, you'll want to load this file using your userscript.
- * `BuildingSorter.main.js` is everything you need if you want to have the source code instead of loading the mod.
- * `BuildingSorter.user.js` is the recommended userscript you can use to load Building Sorter and keep it up to date..
+* `BuildingSorter.js` is just the source code.
+* `BuildingSorter.main.js` is everything you need if you want to have the source code loading inside an extension.
+* `BuildingSorter.user.js` is the recommended userscript you can use to load Charting Mutations and keep it up to date.
 ## Credits:
 Huge thanks to [CookieMonster](https://github.com/CookieMonsterTeam/CookieMonster), I learned a ton from their code, and I also borrowed a ton of their README.
  
@@ -66,3 +66,7 @@ This is a just passion project of mine. These are my ideas for how to improve. B
     - Allow animation speed to be an option.
     - Rename "Allow check for updates" to be "Updates: ON/OFF"
    
+# Check out my OTHER mod!
+
+## <a href="https://github.com/Frustrated-Programmer/ChartingMutations">Charting Mutations:</a>
+<a href="https://github.com/Frustrated-Programmer/ChartingMutations"><img src="ChartingMutationsPreview.png" style="width: 50%"></a>
