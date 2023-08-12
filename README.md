@@ -20,7 +20,7 @@ Copy this code and save it as a bookmark. Paste it in the URL section. To activa
 
 ```javascript
 javascript: (function () {
-  Game.LoadMod('https://frustrated-programmer.github.io/BuildingSorter/StocksSorter.js');
+  Game.LoadMod('https://frustrated-programmer.github.io/BuildingSorter/BuildingSorter.js');
 }());
 ```
 
