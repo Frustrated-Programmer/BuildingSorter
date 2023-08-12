@@ -38,7 +38,7 @@ I don't OWN the Steam version, so I've just worked with the documentation. This 
 3. Enable them in-game with the mods menu.
 
 ## Files:
- * `StocksSorter.js` is the source code, you'll want to load this file using your userscript.
+ * `BuildingSorter.js` is the source code, you'll want to load this file using your userscript.
  * `BuildingSorter.main.js` is everything you need if you want to have the source code instead of loading the mod.
  * `BuildingSorter.user.js` is the recommended userscript you can use to load Building Sorter and keep it up to date..
 ## Credits:
