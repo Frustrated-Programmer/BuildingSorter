@@ -70,3 +70,6 @@ This is a just passion project of mine. These are my ideas for how to improve. B
 
 ## <a href="https://github.com/Frustrated-Programmer/ChartingMutations">Charting Mutations:</a>
 <a href="https://github.com/Frustrated-Programmer/ChartingMutations"><img src="ChartingMutationsPreview.png" style="width: 50%"></a>
+
+## <a href="https://github.com/Frustrated-Programmer/SugarLumpInfo">Sugar Lump Info</a>
+<a href="https://github.com/Frustrated-Programmer/SugarLumpInfo"><img src="SugarLumpInfoPreview.gif"></a>
