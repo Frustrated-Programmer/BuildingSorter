@@ -66,10 +66,12 @@ This is a just passion project of mine. These are my ideas for how to improve. B
     - Allow animation speed to be an option.
     - Rename "Allow check for updates" to be "Updates: ON/OFF"
    
-# Check out my OTHER mod!
+# Check out my OTHER mods!
 
 ## <a href="https://github.com/Frustrated-Programmer/ChartingMutations">Charting Mutations:</a>
+Have you ever had to open the wiki to look at how you grow a certain crop? Is it frustrating that to play the Garden you have to memorize crop mutations? Well this mod solves all of that by _showing_ you how to grow every crop!<br>
 <a href="https://github.com/Frustrated-Programmer/ChartingMutations"><img src="ChartingMutationsPreview.png" style="width: 50%"></a>
 
 ## <a href="https://github.com/Frustrated-Programmer/SugarLumpInfo">Sugar Lump Info</a>
-<a href="https://github.com/Frustrated-Programmer/SugarLumpInfo"><img src="SugarLumpInfoPreview.gif"></a>
+The current tooltip for sugar lumps is cramped and tells you information that you already know or is useless to everyone. I have simplified the tooltip and made it more dynamic, fitting every scenario while also leaving a detailed tooltip availible.<br>
+<a href="https://github.com/Frustrated-Programmer/SugarLumpInfo"><img src="SugarLumpInfoPreview.gif"  style="width: 50%"></a>
