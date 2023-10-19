@@ -698,13 +698,13 @@ class BuildingSorterClass {
             {
                 enabled: true,
                 sorterFrom:"BuildingSorter",
-                text: "Built In",
+                text: "Default",
                 description: "Sort's building's by their ID's number. This ranks them in order how they were designed to be displayed. This theoretically works with mods that adds new options so long as their ID is a number.",
                 tooltip: {
                     icon: [10, 0],
-                    title: "Built In",
-                    forwardDescription: "Orders the buildings based on their <b>built in</b> order.",
-                    reverseDescription: "Orders the buildings based on their <b>built in</b> order but backwards.",
+                    title: "Default",
+                    forwardDescription: "Orders the buildings based on their <b>default</b> order.",
+                    reverseDescription: "Orders the buildings based on their <b>default</b> order but backwards.",
                     quote: "Classic Ortiel's List."
                 },
                 sort: function(array){

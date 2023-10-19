@@ -1,4 +1,8 @@
 #Patch-notes
+## 2.6 Renamed a sorter
+<ul>
+    <li>The sorter "Built In" is now called "Default"</li>
+</ul>
 ## 2.5 Fixed Saving
 <ul>
     <li>Saves were bugged out in v2.4. Fixed!</li>
