@@ -28,7 +28,7 @@
 // do better error handling for CustomSorter
 
 // CONSTANTS
-const version = "2.5";
+const version = "2.6";
 const uniqueCharacter = "ô";
 const defaultCustomSorter = "return function(array){\n\treturn array.sort(function(building1,building2){\n\t\treturn building1.price - building2.price;//Sorts array by cheapest buildings.\n\t});\n}";
 // ==USER CHANGEABLE== (but not saved)
